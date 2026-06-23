@@ -964,12 +964,22 @@ function iniciarSessao() {
   // Mostrar app
   document.body.classList.add('app-pronto');
 
-  // Iniciar listeners
-  if (sessaoAtual.nivel !== 'super_admin') {
-    iniciarListeners();
+  // Iniciar listeners — super_admin também precisa carregar dados de uma empresa
+  if (sessaoAtual.nivel === 'super_admin') {
+    carregarDadosAdmin().then(() => {
+      // Se há empresas cadastradas, usa a primeira para visualizar dados
+      if (empresas.length > 0) {
+        const primeiraEmpresa = empresas[0];
+        sessaoAtual.empresaId   = primeiraEmpresa.id;
+        sessaoAtual.empresaNome = primeiraEmpresa.nome;
+        document.getElementById('headerEmpresa').textContent = `👁 ${primeiraEmpresa.nome}`;
+        document.getElementById('headerEmpresa').style.display = 'block';
+        iniciarListeners();
+      }
+      renderDashboard();
+    });
   } else {
-    carregarDadosAdmin();
-    renderDashboard();
+    iniciarListeners();
   }
 
   navegarModulo('dashboard');
@@ -1312,7 +1322,13 @@ function renderListaEmpresas() {
         <div class="empresa-nome">${esc(e.nome)}</div>
         <div class="empresa-info">${esc(e.responsavel||'')}</div>
       </div>
-      <span class="empresa-badge">Ativa</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="visualizarEmpresa('${e.id}','${esc(e.nome)}')"
+          style="background:var(--verde-folha);color:var(--verde-floresta);border:none;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer">
+          👁 Ver
+        </button>
+        <span class="empresa-badge">Ativa</span>
+      </div>
     </div>`).join('');
 }
 
@@ -1334,6 +1350,18 @@ function renderListaUsuarios() {
     </div>`;
   }).join('');
 }
+
+window.visualizarEmpresa = function(id, nome) {
+  sessaoAtual.empresaId   = id;
+  sessaoAtual.empresaNome = nome;
+  document.getElementById('headerEmpresa').textContent = `👁 ${nome}`;
+  document.getElementById('headerEmpresa').style.display = 'block';
+  if (unsubProdutos) { unsubProdutos(); unsubProdutos = null; }
+  produtos = []; historico = [];
+  iniciarListeners();
+  fecharAdmin();
+  navegarModulo('dashboard');
+};
 
 window.abrirAdmin = function() {
   carregarDadosAdmin();
