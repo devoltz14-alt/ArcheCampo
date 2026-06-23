@@ -194,6 +194,114 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
 }
 
 /* =====================================================================
+   IRRIGAÇÃO
+   ===================================================================== */
+.irrig-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+.irrig-titulo { font-size: 20px; font-weight: 800; color: var(--verde-floresta); }
+.irrig-filtros { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.irrig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+@media (max-width: 900px) { .irrig-grid { grid-template-columns: 1fr; } }
+
+.irrig-form-card {
+  background: var(--branco); border: 1px solid var(--verde-borda);
+  border-radius: 12px; padding: 20px;
+}
+.irrig-form-titulo {
+  font-size: 13px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--verde-floresta); margin-bottom: 16px;
+  padding-bottom: 10px; border-bottom: 2px solid var(--verde-borda);
+}
+
+/* Chips de percentímetro */
+.pct-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 6px; margin-top: 6px;
+}
+.pct-chip {
+  padding: 7px 4px; border-radius: 8px; text-align: center;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  border: 1.5px solid var(--verde-borda); background: var(--verde-claro);
+  color: var(--texto-suave); transition: all .15s;
+}
+.pct-chip:hover { border-color: var(--verde-campo); color: var(--verde-campo); }
+.pct-chip.selecionado {
+  background: var(--verde-floresta); color: var(--branco);
+  border-color: var(--verde-floresta);
+}
+.pct-chip .pct-mm {
+  font-size: 9px; font-weight: 600; display: block;
+  color: var(--verde-suave); margin-top: 1px;
+}
+.pct-chip.selecionado .pct-mm { color: var(--verde-folha); }
+
+/* Volta chips */
+.volta-opcoes { display: flex; gap: 8px; margin-top: 6px; }
+.volta-chip {
+  flex: 1; padding: 9px; border-radius: 8px; text-align: center;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  border: 1.5px solid var(--verde-borda); background: var(--verde-claro);
+  color: var(--texto-suave); transition: all .15s;
+}
+.volta-chip.selecionado {
+  background: var(--verde-campo); color: var(--branco);
+  border-color: var(--verde-campo);
+}
+
+/* MM preview */
+.mm-preview {
+  background: var(--verde-claro); border: 2px solid var(--verde-folha);
+  border-radius: 10px; padding: 14px; text-align: center; margin-top: 12px;
+}
+.mm-preview-num { font-size: 32px; font-weight: 800; color: var(--verde-floresta); }
+.mm-preview-label { font-size: 11px; color: var(--texto-suave); margin-top: 2px; }
+
+/* Resumo por fazenda */
+.irrig-resumo { display: flex; flex-direction: column; gap: 12px; }
+.irrig-fazenda-card {
+  background: var(--branco); border: 1px solid var(--verde-borda);
+  border-radius: 12px; padding: 16px;
+}
+.irrig-fazenda-nome {
+  font-size: 13px; font-weight: 800; color: var(--verde-floresta);
+  margin-bottom: 10px; display: flex; align-items: center;
+  justify-content: space-between;
+}
+.irrig-fazenda-mm {
+  font-size: 18px; font-weight: 800; color: var(--verde-campo);
+}
+.irrig-pivo-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 0; font-size: 12px;
+  border-bottom: 1px solid var(--fundo);
+}
+.irrig-pivo-row:last-child { border-bottom: none; }
+.irrig-pivo-nome { flex: 1; color: var(--texto-suave); font-weight: 600; }
+.irrig-pivo-bar-wrap { flex: 2; background: var(--verde-borda); border-radius: 4px; height: 6px; }
+.irrig-pivo-bar { background: var(--verde-folha); border-radius: 4px; height: 6px; transition: width .3s; }
+.irrig-pivo-mm { min-width: 55px; text-align: right; font-weight: 700; color: var(--verde-floresta); }
+
+/* Lista de lançamentos */
+.irrig-lista { margin-top: 24px; }
+.irrig-lista-titulo {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--texto-suave); margin-bottom: 12px;
+}
+.irrig-item {
+  background: var(--branco); border: 1px solid var(--borda);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px;
+}
+.irrig-item-data { font-size: 11px; color: var(--texto-suave); min-width: 80px; }
+.irrig-item-info { flex: 1; }
+.irrig-item-pivo { font-size: 13px; font-weight: 700; color: var(--verde-floresta); }
+.irrig-item-det { font-size: 11px; color: var(--texto-suave); margin-top: 2px; }
+.irrig-item-mm { font-size: 16px; font-weight: 800; color: var(--verde-campo); }
+
+/* =====================================================================
    DASHBOARD
    ===================================================================== */
 .dash-saudacao { margin-bottom: 24px; }
@@ -603,13 +711,84 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
-     IRRIGAÇÃO (placeholder)
+     IRRIGAÇÃO
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="tela-irrigacao" id="telaIrrigacao">
-  <div style="text-align:center;padding:60px;color:var(--texto-suave)">
-    <div style="font-size:48px;margin-bottom:16px">💧</div>
-    <div style="font-size:18px;font-weight:700;color:var(--verde-floresta)">Módulo Irrigação</div>
-    <div style="margin-top:8px">Em construção para o ArcheCampo</div>
+
+  <div class="irrig-header">
+    <div>
+      <div class="irrig-titulo">💧 Irrigação</div>
+      <div style="font-size:13px;color:var(--texto-suave);margin-top:2px" id="irrigSubtitulo"></div>
+    </div>
+    <div class="irrig-filtros">
+      <select class="filtro-select" id="irrigFiltroMes" onchange="renderIrrig()"></select>
+      <button class="btn-primario" onclick="abrirModalIrrig()">+ Lançamento</button>
+    </div>
+  </div>
+
+  <div class="irrig-grid">
+    <!-- Resumo por fazenda -->
+    <div>
+      <div class="irrig-lista-titulo">📊 MM por fazenda no mês</div>
+      <div class="irrig-resumo" id="irrigResumo">
+        <div style="color:var(--texto-suave);font-size:13px">Carregando...</div>
+      </div>
+    </div>
+    <!-- Últimos lançamentos -->
+    <div>
+      <div class="irrig-lista-titulo">🕐 Últimos lançamentos</div>
+      <div id="irrigLista">
+        <div style="color:var(--texto-suave);font-size:13px">Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL IRRIGAÇÃO -->
+<div class="modal-overlay" id="modalIrrig">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-titulo">💧 Novo Lançamento de Irrigação</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="campo-grupo">
+        <label class="campo-label">Data</label>
+        <input class="campo-input" id="irrigData" type="date" />
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Fazenda</label>
+        <select class="campo-select" id="irrigFazenda" onchange="atualizarPivosSelect()"></select>
+      </div>
+    </div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Pivô</label>
+      <select class="campo-select" id="irrigPivo" onchange="atualizarChipsPct()"></select>
+    </div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Percentímetro</label>
+      <div class="pct-grid" id="pctGrid"></div>
+    </div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Volta</label>
+      <div class="volta-opcoes">
+        <div class="volta-chip selecionado" id="voltaCompleta" onclick="selecionarVolta('Completa')">Completa</div>
+        <div class="volta-chip" id="voltaMeia" onclick="selecionarVolta('Meia')">Meia Volta</div>
+      </div>
+    </div>
+
+    <div class="mm-preview" id="mmPreview" style="display:none">
+      <div class="mm-preview-num" id="mmPreviewNum">0.0 mm</div>
+      <div class="mm-preview-label">lâmina calculada</div>
+    </div>
+
+    <div class="modal-erro" id="irrigErro"></div>
+    <div class="modal-acoes">
+      <button class="btn-cancelar" onclick="fecharModal('modalIrrig')">Cancelar</button>
+      <button class="btn-salvar" onclick="confirmarIrrig()">Salvar</button>
+    </div>
   </div>
 </div>
 
@@ -892,6 +1071,11 @@ function docRef(path, id) {
 }
 
 // ─── AUTH ──────────────────────────────────────────────────────────
+// Expor db e funções para uso no console do navegador
+window._db = db;
+window._addDoc = addDoc;
+window._collection = collection;
+
 window.fazerLogin = async function() {
   const email = document.getElementById('loginEmail').value.trim();
   const senha  = document.getElementById('loginSenha').value;
@@ -1051,6 +1235,7 @@ window.navegarModulo = function(modulo) {
   document.getElementById('headerModulo').textContent = titulos[modulo] || '';
 
   if (modulo === 'dashboard') renderDashboard();
+  if (modulo === 'irrigacao') iniciarModuloIrrigacao();
 };
 
 // ─── DASHBOARD ─────────────────────────────────────────────────────
@@ -1562,6 +1747,309 @@ document.getElementById('painelAdmin').addEventListener('click', e => {
 // ─── OFFLINE BADGE ─────────────────────────────────────────────────
 window.addEventListener('online',  () => document.getElementById('badgeOffline')?.classList.remove('visivel'));
 window.addEventListener('offline', () => document.getElementById('badgeOffline')?.classList.add('visivel'));
+
+// ─── IRRIGAÇÃO ─────────────────────────────────────────────────────
+let irrigPivotos      = [];   // { id, fazenda, nome, tabela: {5:x, 10:x, ...} }
+let irrigLancamentos  = [];
+let irrigUnsubscribe  = null;
+let irrigPctSel       = null;
+let irrigVoltaSel     = 'Completa';
+
+// Dados fictícios de pivôs para teste (3 fazendas, 15 pivôs)
+const PIVOTOS_SEED = [
+  // FAZENDA VERDE CAMPO
+  { fazenda: 'VERDE CAMPO', nome: 'Pivô 1', tabela: { 5:2.1, 10:4.2, 15:6.3, 20:8.4, 25:10.5, 30:12.6, 35:14.7, 40:16.8, 45:18.9, 50:21.0, 55:23.1, 60:25.2, 65:27.3, 70:29.4, 75:31.5, 80:33.6, 85:35.7, 90:37.8, 95:39.9, 100:42.0 } },
+  { fazenda: 'VERDE CAMPO', nome: 'Pivô 2', tabela: { 5:1.8, 10:3.6, 15:5.4, 20:7.2, 25:9.0, 30:10.8, 35:12.6, 40:14.4, 45:16.2, 50:18.0, 55:19.8, 60:21.6, 65:23.4, 70:25.2, 75:27.0, 80:28.8, 85:30.6, 90:32.4, 95:34.2, 100:36.0 } },
+  { fazenda: 'VERDE CAMPO', nome: 'Pivô 3', tabela: { 5:2.5, 10:5.0, 15:7.5, 20:10.0, 25:12.5, 30:15.0, 35:17.5, 40:20.0, 45:22.5, 50:25.0, 55:27.5, 60:30.0, 65:32.5, 70:35.0, 75:37.5, 80:40.0, 85:42.5, 90:45.0, 95:47.5, 100:50.0 } },
+  { fazenda: 'VERDE CAMPO', nome: 'Pivô 4', tabela: { 5:1.5, 10:3.0, 15:4.5, 20:6.0, 25:7.5, 30:9.0, 35:10.5, 40:12.0, 45:13.5, 50:15.0, 55:16.5, 60:18.0, 65:19.5, 70:21.0, 75:22.5, 80:24.0, 85:25.5, 90:27.0, 95:28.5, 100:30.0 } },
+  { fazenda: 'VERDE CAMPO', nome: 'Pivô 5', tabela: { 5:2.3, 10:4.6, 15:6.9, 20:9.2, 25:11.5, 30:13.8, 35:16.1, 40:18.4, 45:20.7, 50:23.0, 55:25.3, 60:27.6, 65:29.9, 70:32.2, 75:34.5, 80:36.8, 85:39.1, 90:41.4, 95:43.7, 100:46.0 } },
+  // FAZENDA BOA ESPERANÇA
+  { fazenda: 'BOA ESPERANCA', nome: 'Pivô A', tabela: { 5:1.9, 10:3.8, 15:5.7, 20:7.6, 25:9.5, 30:11.4, 35:13.3, 40:15.2, 45:17.1, 50:19.0, 55:20.9, 60:22.8, 65:24.7, 70:26.6, 75:28.5, 80:30.4, 85:32.3, 90:34.2, 95:36.1, 100:38.0 } },
+  { fazenda: 'BOA ESPERANCA', nome: 'Pivô B', tabela: { 5:2.2, 10:4.4, 15:6.6, 20:8.8, 25:11.0, 30:13.2, 35:15.4, 40:17.6, 45:19.8, 50:22.0, 55:24.2, 60:26.4, 65:28.6, 70:30.8, 75:33.0, 80:35.2, 85:37.4, 90:39.6, 95:41.8, 100:44.0 } },
+  { fazenda: 'BOA ESPERANCA', nome: 'Pivô C', tabela: { 5:1.7, 10:3.4, 15:5.1, 20:6.8, 25:8.5, 30:10.2, 35:11.9, 40:13.6, 45:15.3, 50:17.0, 55:18.7, 60:20.4, 65:22.1, 70:23.8, 75:25.5, 80:27.2, 85:28.9, 90:30.6, 95:32.3, 100:34.0 } },
+  { fazenda: 'BOA ESPERANCA', nome: 'Pivô D', tabela: { 5:2.8, 10:5.6, 15:8.4, 20:11.2, 25:14.0, 30:16.8, 35:19.6, 40:22.4, 45:25.2, 50:28.0, 55:30.8, 60:33.6, 65:36.4, 70:39.2, 75:42.0, 80:44.8, 85:47.6, 90:50.4, 95:53.2, 100:56.0 } },
+  { fazenda: 'BOA ESPERANCA', nome: 'Pivô E', tabela: { 5:2.0, 10:4.0, 15:6.0, 20:8.0, 25:10.0, 30:12.0, 35:14.0, 40:16.0, 45:18.0, 50:20.0, 55:22.0, 60:24.0, 65:26.0, 70:28.0, 75:30.0, 80:32.0, 85:34.0, 90:36.0, 95:38.0, 100:40.0 } },
+  // FAZENDA SAO JOAO
+  { fazenda: 'SAO JOAO', nome: 'P-01', tabela: { 5:1.6, 10:3.2, 15:4.8, 20:6.4, 25:8.0, 30:9.6, 35:11.2, 40:12.8, 45:14.4, 50:16.0, 55:17.6, 60:19.2, 65:20.8, 70:22.4, 75:24.0, 80:25.6, 85:27.2, 90:28.8, 95:30.4, 100:32.0 } },
+  { fazenda: 'SAO JOAO', nome: 'P-02', tabela: { 5:2.4, 10:4.8, 15:7.2, 20:9.6, 25:12.0, 30:14.4, 35:16.8, 40:19.2, 45:21.6, 50:24.0, 55:26.4, 60:28.8, 65:31.2, 70:33.6, 75:36.0, 80:38.4, 85:40.8, 90:43.2, 95:45.6, 100:48.0 } },
+  { fazenda: 'SAO JOAO', nome: 'P-03', tabela: { 5:1.4, 10:2.8, 15:4.2, 20:5.6, 25:7.0, 30:8.4, 35:9.8, 40:11.2, 45:12.6, 50:14.0, 55:15.4, 60:16.8, 65:18.2, 70:19.6, 75:21.0, 80:22.4, 85:23.8, 90:25.2, 95:26.6, 100:28.0 } },
+  { fazenda: 'SAO JOAO', nome: 'P-04', tabela: { 5:2.6, 10:5.2, 15:7.8, 20:10.4, 25:13.0, 30:15.6, 35:18.2, 40:20.8, 45:23.4, 50:26.0, 55:28.6, 60:31.2, 65:33.8, 70:36.4, 75:39.0, 80:41.6, 85:44.2, 90:46.8, 95:49.4, 100:52.0 } },
+  { fazenda: 'SAO JOAO', nome: 'P-05', tabela: { 5:1.2, 10:2.4, 15:3.6, 20:4.8, 25:6.0, 30:7.2, 35:8.4, 40:9.6, 45:10.8, 50:12.0, 55:13.2, 60:14.4, 65:15.6, 70:16.8, 75:18.0, 80:19.2, 85:20.4, 90:21.6, 95:22.8, 100:24.0 } },
+];
+
+function iniciarListenersIrrig() {
+  if (irrigUnsubscribe) irrigUnsubscribe();
+  irrigUnsubscribe = onSnapshot(
+    collection(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_lancamentos'),
+    snap => {
+      irrigLancamentos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => (b.dataLocal || 0) - (a.dataLocal || 0));
+      if (moduloAtivo === 'irrigacao') renderIrrig();
+      renderDashboard();
+    }
+  );
+}
+
+async function carregarPivotos() {
+  const snap = await getDocs(collection(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_pivotos'));
+  irrigPivotos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+window.iniciarModuloIrrigacao = async function() {
+  if (irrigPivotos.length === 0) await carregarPivotos();
+  popularMesesIrrig();
+  popularFazendasSelect();
+  iniciarListenersIrrig();
+  renderIrrig();
+};
+
+function popularMesesIrrig() {
+  const sel = document.getElementById('irrigFiltroMes');
+  if (!sel) return;
+  const meses = [];
+  const agora = new Date();
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+    meses.push({ valor: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, label: d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) });
+  }
+  sel.innerHTML = meses.map(m => `<option value="${m.valor}">${m.label}</option>`).join('');
+}
+
+function getMesSelecionado() {
+  const v = document.getElementById('irrigFiltroMes')?.value || '';
+  if (!v) return null;
+  const [ano, mes] = v.split('-').map(Number);
+  return { ano, mes };
+}
+
+function getLancamentosMes() {
+  const m = getMesSelecionado();
+  if (!m) return irrigLancamentos;
+  return irrigLancamentos.filter(l => {
+    const d = new Date(l.dataLocal);
+    return d.getFullYear() === m.ano && d.getMonth() + 1 === m.mes;
+  });
+}
+
+window.renderIrrig = function() {
+  const mes = getMesSelecionado();
+  const label = mes ? new Date(mes.ano, mes.mes - 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) : '';
+  const el = document.getElementById('irrigSubtitulo');
+  if (el) el.textContent = label;
+
+  const lancMes = getLancamentosMes();
+  const fazendas = [...new Set(irrigPivotos.map(p => p.fazenda))].sort();
+
+  // Resumo por fazenda
+  const resumoEl = document.getElementById('irrigResumo');
+  if (resumoEl) {
+    if (fazendas.length === 0) {
+      resumoEl.innerHTML = '<div style="color:var(--texto-suave);font-size:13px">Nenhum pivô cadastrado</div>';
+    } else {
+      resumoEl.innerHTML = fazendas.map(faz => {
+        const pivosFaz = irrigPivotos.filter(p => p.fazenda === faz);
+        const totalFaz = lancMes.filter(l => l.fazenda === faz).reduce((s, l) => s + (l.mm || 0), 0);
+        const maxMM = Math.max(...pivosFaz.map(p => {
+          return lancMes.filter(l => l.pivoId === p.id).reduce((s, l) => s + (l.mm || 0), 0);
+        }), 1);
+
+        const pivosHtml = pivosFaz.map(p => {
+          const mmPivo = lancMes.filter(l => l.pivoId === p.id).reduce((s, l) => s + (l.mm || 0), 0);
+          const pct = Math.min(100, Math.round((mmPivo / Math.max(maxMM, 1)) * 100));
+          return `<div class="irrig-pivo-row">
+            <span class="irrig-pivo-nome">${esc(p.nome)}</span>
+            <div class="irrig-pivo-bar-wrap"><div class="irrig-pivo-bar" style="width:${pct}%"></div></div>
+            <span class="irrig-pivo-mm">${mmPivo.toFixed(1)} mm</span>
+          </div>`;
+        }).join('');
+
+        return `<div class="irrig-fazenda-card">
+          <div class="irrig-fazenda-nome">
+            🌿 ${esc(faz)}
+            <span class="irrig-fazenda-mm">${totalFaz.toFixed(1)} mm</span>
+          </div>
+          ${pivosHtml}
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Lista de lançamentos
+  const listaEl = document.getElementById('irrigLista');
+  if (listaEl) {
+    if (lancMes.length === 0) {
+      listaEl.innerHTML = '<div style="color:var(--texto-suave);font-size:13px;text-align:center;padding:20px">Nenhum lançamento no mês</div>';
+    } else {
+      listaEl.innerHTML = lancMes.slice(0, 20).map(l => {
+        const data = new Date(l.dataLocal).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+        return `<div class="irrig-item">
+          <div class="irrig-item-data">${data}</div>
+          <div class="irrig-item-info">
+            <div class="irrig-item-pivo">${esc(l.pivoNome || '')} — ${esc(l.fazenda || '')}</div>
+            <div class="irrig-item-det">${l.percentimetro}% · ${esc(l.volta || '')} · ${esc(l.usuario || '')}</div>
+          </div>
+          <div class="irrig-item-mm">${(l.mm || 0).toFixed(1)} mm</div>
+        </div>`;
+      }).join('');
+    }
+  }
+};
+
+function popularFazendasSelect() {
+  const sel = document.getElementById('irrigFazenda');
+  if (!sel) return;
+  const fazendas = [...new Set(irrigPivotos.map(p => p.fazenda))].sort();
+  sel.innerHTML = fazendas.map(f => `<option value="${f}">${f}</option>`).join('');
+  atualizarPivosSelect();
+}
+
+window.atualizarPivosSelect = function() {
+  const faz = document.getElementById('irrigFazenda')?.value;
+  const sel = document.getElementById('irrigPivo');
+  if (!sel) return;
+  const pivosFaz = irrigPivotos.filter(p => p.fazenda === faz);
+  sel.innerHTML = pivosFaz.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+  atualizarChipsPct();
+};
+
+window.atualizarChipsPct = function() {
+  const pivoId = document.getElementById('irrigPivo')?.value;
+  const pivo = irrigPivotos.find(p => p.id === pivoId);
+  const grid = document.getElementById('pctGrid');
+  if (!grid || !pivo) return;
+  irrigPctSel = null;
+  const tabela = pivo.tabela || {};
+  grid.innerHTML = Object.keys(tabela).sort((a,b) => Number(a)-Number(b)).map(pct => `
+    <div class="pct-chip" onclick="selecionarPct(${pct})" id="pct-${pct}">
+      ${pct}%
+      <span class="pct-mm">${tabela[pct]} mm</span>
+    </div>`).join('');
+  atualizarMMPreview();
+};
+
+window.selecionarPct = function(pct) {
+  irrigPctSel = pct;
+  document.querySelectorAll('.pct-chip').forEach(c => c.classList.remove('selecionado'));
+  document.getElementById(`pct-${pct}`)?.classList.add('selecionado');
+  atualizarMMPreview();
+};
+
+window.selecionarVolta = function(volta) {
+  irrigVoltaSel = volta;
+  document.getElementById('voltaCompleta')?.classList.toggle('selecionado', volta === 'Completa');
+  document.getElementById('voltaMeia')?.classList.toggle('selecionado', volta === 'Meia');
+  atualizarMMPreview();
+};
+
+function atualizarMMPreview() {
+  const preview = document.getElementById('mmPreview');
+  const previewNum = document.getElementById('mmPreviewNum');
+  if (!preview || !previewNum) return;
+  if (!irrigPctSel) { preview.style.display = 'none'; return; }
+
+  const pivoId = document.getElementById('irrigPivo')?.value;
+  const pivo = irrigPivotos.find(p => p.id === pivoId);
+  if (!pivo) return;
+
+  const mmBase = pivo.tabela?.[irrigPctSel] || 0;
+  const mm = irrigVoltaSel === 'Meia' ? mmBase / 2 : mmBase;
+  preview.style.display = 'block';
+  previewNum.textContent = `${mm.toFixed(1)} mm`;
+}
+
+window.abrirModalIrrig = async function() {
+  if (irrigPivotos.length === 0) {
+    alert('Nenhum pivô cadastrado. Popule os pivôs primeiro via console: await seedPivotos()');
+    return;
+  }
+  document.getElementById('irrigData').value = new Date().toISOString().split('T')[0];
+  document.getElementById('irrigErro').textContent = '';
+  irrigPctSel = null;
+  irrigVoltaSel = 'Completa';
+  document.getElementById('voltaCompleta')?.classList.add('selecionado');
+  document.getElementById('voltaMeia')?.classList.remove('selecionado');
+  document.getElementById('mmPreview').style.display = 'none';
+  popularFazendasSelect();
+  abrirModal('modalIrrig');
+};
+
+window.confirmarIrrig = async function() {
+  const data        = document.getElementById('irrigData').value;
+  const fazenda     = document.getElementById('irrigFazenda').value;
+  const pivoId      = document.getElementById('irrigPivo').value;
+  const erro        = document.getElementById('irrigErro');
+
+  if (!data)        { erro.textContent = 'Informe a data.'; return; }
+  if (!irrigPctSel) { erro.textContent = 'Selecione o percentímetro.'; return; }
+
+  const pivo   = irrigPivotos.find(p => p.id === pivoId);
+  const mmBase = pivo?.tabela?.[irrigPctSel] || 0;
+  const mm     = irrigVoltaSel === 'Meia' ? mmBase / 2 : mmBase;
+
+  erro.textContent = '';
+  try {
+    await addDoc(collection(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_lancamentos'), {
+      data, fazenda, pivoId, pivoNome: pivo?.nome || '',
+      percentimetro: irrigPctSel, volta: irrigVoltaSel, mm,
+      dataLocal: new Date(data + 'T12:00:00').getTime(),
+      usuario: sessaoAtual.nome || sessaoAtual.email,
+      criadoEm: serverTimestamp()
+    });
+    fecharModal('modalIrrig');
+  } catch(e) {
+    erro.textContent = 'Erro: ' + e.message;
+  }
+};
+
+// Seed de pivôs via console: await seedPivotos()
+window.seedPivotos = async function() {
+  console.log('Criando pivôs...');
+  for (const p of PIVOTOS_SEED) {
+    await addDoc(collection(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_pivotos'), p);
+    console.log('✓', p.fazenda, '-', p.nome);
+  }
+  console.log('✅ ' + PIVOTOS_SEED.length + ' pivotos criados!');
+  await carregarPivotos();
+  popularFazendasSelect();
+  renderIrrig();
+};
+
+// ─── SEED VIA CONSOLE ──────────────────────────────────────────────
+// Uso: await seedConsole('RFqx32QxXQcBN5GnPeZJ')
+window.seedConsole = async function(empresaId) {
+  const produtos = [
+    { nome: 'Roundup WG',      principioAtivo: 'Glifosato',         classe: 'HERBICIDA',       unidade: 'KG', estoque: 320 },
+    { nome: 'Zapp QI 620',     principioAtivo: 'Glifosato',         classe: 'HERBICIDA',       unidade: 'L',  estoque: 180 },
+    { nome: 'Gamit 360 CS',    principioAtivo: 'Clomazone',         classe: 'HERBICIDA',       unidade: 'L',  estoque: 45  },
+    { nome: 'Select 240 EC',   principioAtivo: 'Cletodim',          classe: 'HERBICIDA',       unidade: 'L',  estoque: 8   },
+    { nome: 'Fox Xpro',        principioAtivo: 'Fungicida',         classe: 'FUNGICIDA',       unidade: 'L',  estoque: 95  },
+    { nome: 'Orkestra SC',     principioAtivo: 'Fungicida',         classe: 'FUNGICIDA',       unidade: 'L',  estoque: 60  },
+    { nome: 'Unizeb Gold',     principioAtivo: 'Mancozebe',         classe: 'FUNGICIDA',       unidade: 'KG', estoque: 150 },
+    { nome: 'Nativo',          principioAtivo: 'Tebuconazol',       classe: 'FUNGICIDA',       unidade: 'L',  estoque: 5   },
+    { nome: 'Engeo Pleno S',   principioAtivo: 'Tiametoxam',        classe: 'INSETICIDA',      unidade: 'L',  estoque: 75  },
+    { nome: 'Karate Zeon',     principioAtivo: 'Lambda-cialotrina', classe: 'INSETICIDA',      unidade: 'L',  estoque: 40  },
+    { nome: 'Belt 480 SC',     principioAtivo: 'Flubendiamida',     classe: 'INSETICIDA',      unidade: 'L',  estoque: 22  },
+    { nome: 'Decis 25 EC',     principioAtivo: 'Deltametrina',      classe: 'INSETICIDA',      unidade: 'L',  estoque: 9   },
+    { nome: 'Nimbus',          principioAtivo: 'Oleo mineral',      classe: 'ADJUVANTE',       unidade: 'L',  estoque: 280 },
+    { nome: 'Aureo',           principioAtivo: 'Oleo vegetal',      classe: 'ADJUVANTE',       unidade: 'L',  estoque: 120 },
+    { nome: 'Li 700',          principioAtivo: 'Lecitina de soja',  classe: 'ADJUVANTE',       unidade: 'L',  estoque: 3   },
+    { nome: 'Dipel WP',        principioAtivo: 'B. thuringiensis',  classe: 'BIOLOGICO',       unidade: 'KG', estoque: 35  },
+    { nome: 'Boveril WP',      principioAtivo: 'B. bassiana',       classe: 'BIOLOGICO',       unidade: 'KG', estoque: 12  },
+    { nome: 'Booster',         principioAtivo: 'Calcio + Boro',     classe: 'FOLIAR',          unidade: 'L',  estoque: 90  },
+    { nome: 'Cropmax',         principioAtivo: 'Aminoacidos',       classe: 'FOLIAR',          unidade: 'L',  estoque: 45  },
+    { nome: 'Assist',          principioAtivo: 'Oleo parafinico',   classe: 'OLEO',            unidade: 'L',  estoque: 200 },
+    { nome: 'Iharol',          principioAtivo: 'Oleo de soja',      classe: 'OLEO',            unidade: 'L',  estoque: 85  },
+    { nome: 'Metarex RG',      principioAtivo: 'Metaldéido',        classe: 'MOLUSCICIDA',     unidade: 'KG', estoque: 40  },
+    { nome: 'Cell Tech',       principioAtivo: 'Polissacarideos',   classe: 'MEIO DE CULTURA', unidade: 'L',  estoque: 15  },
+  ];
+
+  console.log('Iniciando seed para empresa:', empresaId);
+  for (const p of produtos) {
+    await addDoc(collection(db, 'empresas', empresaId, 'produtos'), p);
+    console.log('✓', p.nome);
+  }
+  console.log('✅ Seed concluido! ' + produtos.length + ' produtos criados.');
+};
 </script>
 </body>
 </html>
