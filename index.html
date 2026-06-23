@@ -997,11 +997,15 @@ function finalizarSessao() {
 // ─── LISTENERS ─────────────────────────────────────────────────────
 function iniciarListeners() {
   if (unsubProdutos) unsubProdutos();
+  console.log('[DEBUG] iniciarListeners — empresaId:', sessaoAtual?.empresaId);
   const q = query(colRef('produtos'), orderBy('nome'));
   unsubProdutos = onSnapshot(q, snap => {
+    console.log('[DEBUG] snapshot produtos — total:', snap.docs.length);
     produtos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderLista();
     renderDashboard();
+  }, err => {
+    console.error('[DEBUG] erro snapshot:', err);
   });
 }
 
