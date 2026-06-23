@@ -743,6 +743,15 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
     </div>
 
     <div class="painel-section">
+      <div class="painel-section-label">Dados de teste</div>
+      <div style="font-size:12px;color:var(--texto-suave);margin-bottom:10px">
+        Popula a empresa selecionada com produtos e histórico fictícios para testes.
+      </div>
+      <div id="seedLog" style="display:none;background:var(--verde-claro);border-radius:8px;padding:10px;font-size:11px;font-family:monospace;max-height:120px;overflow-y:auto;margin-bottom:8px;color:var(--verde-floresta)"></div>
+      <button class="btn-secundario" style="width:100%" onclick="rodarSeedInterno()" id="btnSeed">🌱 Popular dados de teste</button>
+    </div>
+
+    <div class="painel-section">
       <div class="painel-section-label">Usuários</div>
       <div id="listaUsuarios"><div style="color:var(--texto-suave);font-size:13px">Carregando...</div></div>
       <button class="btn-primario" style="margin-top:12px;width:100%" onclick="abrirModalUsuario()">+ Novo Usuário</button>
@@ -1457,6 +1466,95 @@ window.salvarUsuario = async function() {
     alert(`Usuário "${nome}" criado com sucesso!`);
   } catch(e) {
     erro.textContent = 'Erro: ' + (e.code === 'auth/email-already-in-use' ? 'E-mail já cadastrado.' : e.message);
+  }
+};
+
+// ─── SEED INTERNO ──────────────────────────────────────────────────
+window.rodarSeedInterno = async function() {
+  // Busca empresaId direto do Firestore (não da sessão em memória)
+  const perfilSnap = await getDoc(doc(db, 'usuarios', sessaoAtual.uid));
+  const empresaId  = perfilSnap.data()?.empresaId;
+
+  if (!empresaId) { alert('empresaId não encontrado no seu perfil.'); return; }
+
+  // Confirma com o usuário qual empresa vai popular
+  const empSnap = await getDoc(doc(db, 'empresas', empresaId));
+  const empNome = empSnap.exists() ? empSnap.data().nome : '(não encontrada)';
+
+  if (!confirm(`Vai popular a empresa:\n\n"${empNome}"\nID: ${empresaId}\n\nConfirma?`)) return;
+
+  const btn   = document.getElementById('btnSeed');
+  const logEl = document.getElementById('seedLog');
+  btn.disabled = true;
+  btn.textContent = '⏳ Populando...';
+  logEl.style.display = 'block';
+  logEl.innerHTML = '';
+
+  function log(msg) {
+    logEl.innerHTML += msg + '<br>';
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  const PRODUTOS = [
+    { nome: 'Roundup WG',         principioAtivo: 'Glifosato',                       classe: 'HERBICIDA',       unidade: 'KG', estoque: 320 },
+    { nome: 'Zapp QI 620',        principioAtivo: 'Glifosato',                       classe: 'HERBICIDA',       unidade: 'L',  estoque: 180 },
+    { nome: 'Gamit 360 CS',       principioAtivo: 'Clomazone',                       classe: 'HERBICIDA',       unidade: 'L',  estoque: 45  },
+    { nome: 'Verdict R',          principioAtivo: 'Haloxifope-P-metílico',           classe: 'HERBICIDA',       unidade: 'L',  estoque: 28  },
+    { nome: 'Select 240 EC',      principioAtivo: 'Cletodim',                        classe: 'HERBICIDA',       unidade: 'L',  estoque: 8   },
+    { nome: 'Provence 750 WG',    principioAtivo: 'Isoxaflutol',                     classe: 'HERBICIDA',       unidade: 'KG', estoque: 0   },
+    { nome: 'Fox Xpro',           principioAtivo: 'Bixafen + Trifloxistrobina',      classe: 'FUNGICIDA',       unidade: 'L',  estoque: 95  },
+    { nome: 'Orkestra SC',        principioAtivo: 'Fluxapiroxade + Piraclostrobina', classe: 'FUNGICIDA',       unidade: 'L',  estoque: 60  },
+    { nome: 'Priori Xtra',        principioAtivo: 'Azoxistrobina + Ciproconazol',    classe: 'FUNGICIDA',       unidade: 'L',  estoque: 0   },
+    { nome: 'Unizeb Gold',        principioAtivo: 'Mancozebe',                       classe: 'FUNGICIDA',       unidade: 'KG', estoque: 150 },
+    { nome: 'Nativo',             principioAtivo: 'Trifloxistrobina + Tebuconazol',  classe: 'FUNGICIDA',       unidade: 'L',  estoque: 5   },
+    { nome: 'Engeo Pleno S',      principioAtivo: 'Tiametoxam + Lambda-cialotrina',  classe: 'INSETICIDA',      unidade: 'L',  estoque: 75  },
+    { nome: 'Karate Zeon 250 CS', principioAtivo: 'Lambda-cialotrina',               classe: 'INSETICIDA',      unidade: 'L',  estoque: 40  },
+    { nome: 'Belt 480 SC',        principioAtivo: 'Flubendiamida',                   classe: 'INSETICIDA',      unidade: 'L',  estoque: 22  },
+    { nome: 'Decis 25 EC',        principioAtivo: 'Deltametrina',                    classe: 'INSETICIDA',      unidade: 'L',  estoque: 9   },
+    { nome: 'Evidence 700 WG',    principioAtivo: 'Imidacloprido',                   classe: 'INSETICIDA',      unidade: 'KG', estoque: 0   },
+    { nome: 'Nimbus',             principioAtivo: 'Óleo mineral',                    classe: 'ADJUVANTE',       unidade: 'L',  estoque: 280 },
+    { nome: 'Aureo',              principioAtivo: 'Óleo vegetal',                    classe: 'ADJUVANTE',       unidade: 'L',  estoque: 120 },
+    { nome: 'Li 700',             principioAtivo: 'Lecitina de soja',                classe: 'ADJUVANTE',       unidade: 'L',  estoque: 3   },
+    { nome: 'Silwet L-77',        principioAtivo: 'Silicone orgânico',               classe: 'ADJUVANTE',       unidade: 'L',  estoque: 55  },
+    { nome: 'Dipel WP',           principioAtivo: 'Bacillus thuringiensis',          classe: 'BIOLÓGICO',       unidade: 'KG', estoque: 35  },
+    { nome: 'Boveril WP',         principioAtivo: 'Beauveria bassiana',              classe: 'BIOLÓGICO',       unidade: 'KG', estoque: 12  },
+    { nome: 'Booster',            principioAtivo: 'Cálcio + Boro',                   classe: 'FOLIAR',          unidade: 'L',  estoque: 90  },
+    { nome: 'Cropmax',            principioAtivo: 'Aminoácidos + micronutrientes',   classe: 'FOLIAR',          unidade: 'L',  estoque: 45  },
+    { nome: 'Aktuel',             principioAtivo: 'Potássio + Boro',                 classe: 'FOLIAR',          unidade: 'L',  estoque: 0   },
+    { nome: 'Assist',             principioAtivo: 'Óleo mineral parafínico',         classe: 'OLEO',            unidade: 'L',  estoque: 200 },
+    { nome: 'Iharol',             principioAtivo: 'Óleo vegetal de soja',            classe: 'OLEO',            unidade: 'L',  estoque: 85  },
+    { nome: 'Metarex RG',         principioAtivo: 'Metaldéído',                      classe: 'MOLUSCICIDA',     unidade: 'KG', estoque: 40  },
+    { nome: 'Cell Tech',          principioAtivo: 'Polissacarídeos',                 classe: 'MEIO DE CULTURA', unidade: 'L',  estoque: 15  },
+  ];
+
+  try {
+    log(`🏢 Empresa: ${empNome}`);
+    log(`🔑 ID: ${empresaId}`);
+    log(`📦 Criando ${PRODUTOS.length} produtos...`);
+
+    for (const p of PRODUTOS) {
+      await addDoc(collection(db, 'empresas', empresaId, 'produtos'), {
+        ...p, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+      });
+      log(`✓ ${p.nome} — ${p.estoque} ${p.unidade}`);
+    }
+
+    // Atualiza sessão com empresaId correto
+    sessaoAtual.empresaId   = empresaId;
+    sessaoAtual.empresaNome = empNome;
+    if (unsubProdutos) { unsubProdutos(); unsubProdutos = null; }
+    iniciarListeners();
+
+    log(`✅ Concluído! ${PRODUTOS.length} produtos criados.`);
+    btn.textContent  = '✅ Concluído!';
+    btn.style.background = 'var(--verde-campo)';
+    btn.style.color  = '#fff';
+    btn.style.border = 'none';
+
+  } catch(e) {
+    log(`❌ Erro: ${e.message}`);
+    btn.disabled = false;
+    btn.textContent = '🌱 Tentar novamente';
   }
 };
 
