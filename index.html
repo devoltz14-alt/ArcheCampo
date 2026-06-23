@@ -766,6 +766,32 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
       <select class="campo-select" id="irrigPivo" onchange="atualizarChipsPct()"></select>
     </div>
 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="campo-grupo">
+        <label class="campo-label">Cultura</label>
+        <select class="campo-select" id="irrigCultura">
+          <option value="🌱 Soja">🌱 Soja</option>
+          <option value="🌽 Milho">🌽 Milho</option>
+          <option value="🫛 Milho Verde">🫛 Milho Verde</option>
+          <option value="🫘 Feijão">🫘 Feijão</option>
+          <option value="🍚 Arroz">🍚 Arroz</option>
+          <option value="🌾 Trigo">🌾 Trigo</option>
+          <option value="🌻 Sorgo">🌻 Sorgo</option>
+          <option value="🥜 Amendoim">🥜 Amendoim</option>
+          <option value="☁️ Algodão">☁️ Algodão</option>
+          <option value="🌿 Pasto">🌿 Pasto</option>
+        </select>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Safra</label>
+        <select class="campo-select" id="irrigSafra">
+          <option value="25/26">25/26</option>
+          <option value="26/26">26/26</option>
+          <option value="24/25">24/25</option>
+        </select>
+      </div>
+    </div>
+
     <div class="campo-grupo">
       <label class="campo-label">Percentímetro</label>
       <div class="pct-grid" id="pctGrid"></div>
@@ -1886,7 +1912,7 @@ window.renderIrrig = function() {
           <div class="irrig-item-data">${data}</div>
           <div class="irrig-item-info">
             <div class="irrig-item-pivo">${esc(l.pivoNome || '')} — ${esc(l.fazenda || '')}</div>
-            <div class="irrig-item-det">${l.percentimetro}% · ${esc(l.volta || '')} · ${esc(l.usuario || '')}</div>
+            <div class="irrig-item-det">${l.percentimetro}% · ${esc(l.volta || '')} · ${esc(l.cultura || '')} · ${esc(l.safra || '')} · ${esc(l.usuario || '')}</div>
           </div>
           <div class="irrig-item-mm">${(l.mm || 0).toFixed(1)} mm</div>
         </div>`;
@@ -1977,6 +2003,8 @@ window.confirmarIrrig = async function() {
   const data        = document.getElementById('irrigData').value;
   const fazenda     = document.getElementById('irrigFazenda').value;
   const pivoId      = document.getElementById('irrigPivo').value;
+  const cultura     = document.getElementById('irrigCultura').value;
+  const safra       = document.getElementById('irrigSafra').value;
   const erro        = document.getElementById('irrigErro');
 
   if (!data)        { erro.textContent = 'Informe a data.'; return; }
@@ -1991,6 +2019,7 @@ window.confirmarIrrig = async function() {
     await addDoc(collection(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_lancamentos'), {
       data, fazenda, pivoId, pivoNome: pivo?.nome || '',
       percentimetro: irrigPctSel, volta: irrigVoltaSel, mm,
+      cultura, safra,
       dataLocal: new Date(data + 'T12:00:00').getTime(),
       usuario: sessaoAtual.nome || sessaoAtual.email,
       criadoEm: serverTimestamp()
