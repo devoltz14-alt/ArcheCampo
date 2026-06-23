@@ -998,10 +998,12 @@ function finalizarSessao() {
 function iniciarListeners() {
   if (unsubProdutos) unsubProdutos();
   console.log('[DEBUG] iniciarListeners — empresaId:', sessaoAtual?.empresaId);
-  const q = query(colRef('produtos'), orderBy('nome'));
+  const q = collection(db, 'empresas', sessaoAtual.empresaId, 'produtos');
   unsubProdutos = onSnapshot(q, snap => {
     console.log('[DEBUG] snapshot produtos — total:', snap.docs.length);
-    produtos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    produtos = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'));
     renderLista();
     renderDashboard();
   }, err => {
