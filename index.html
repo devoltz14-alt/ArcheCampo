@@ -747,8 +747,7 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
       <div style="font-size:12px;color:var(--texto-suave);margin-bottom:10px">
         Popula a empresa selecionada com produtos e histórico fictícios para testes.
       </div>
-      <div id="seedLog" style="display:none;background:var(--verde-claro);border-radius:8px;padding:10px;font-size:11px;font-family:monospace;max-height:120px;overflow-y:auto;margin-bottom:8px;color:var(--verde-floresta)"></div>
-      <button class="btn-secundario" style="width:100%" onclick="rodarSeedInterno()" id="btnSeed">🌱 Popular dados de teste</button>
+
     </div>
 
     <div class="painel-section">
@@ -1339,18 +1338,26 @@ function renderListaEmpresas() {
   if (!el) return;
   if (empresas.length === 0) { el.innerHTML = '<div style="color:var(--texto-suave);font-size:13px">Nenhuma empresa cadastrada</div>'; return; }
   el.innerHTML = empresas.map(e => `
-    <div class="empresa-card">
-      <div>
-        <div class="empresa-nome">${esc(e.nome)}</div>
-        <div class="empresa-info">${esc(e.responsavel||'')}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <button onclick="visualizarEmpresa('${e.id}','${esc(e.nome)}')"
-          style="background:var(--verde-folha);color:var(--verde-floresta);border:none;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer">
-          👁 Ver
-        </button>
+    <div class="empresa-card" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+        <div>
+          <div class="empresa-nome">${esc(e.nome)}</div>
+          <div class="empresa-info">${esc(e.responsavel||'')}</div>
+          <div style="font-size:10px;color:var(--texto-suave);margin-top:2px;font-family:monospace">${e.id}</div>
+        </div>
         <span class="empresa-badge">Ativa</span>
       </div>
+      <div style="display:flex;gap:6px;width:100%">
+        <button onclick="visualizarEmpresa('${e.id}','${esc(e.nome)}')"
+          style="flex:1;background:var(--verde-folha);color:var(--verde-floresta);border:none;border-radius:6px;padding:6px;font-size:11px;font-weight:700;cursor:pointer">
+          👁 Visualizar
+        </button>
+        <button onclick="seedEmpresa('${e.id}','${esc(e.nome)}')"
+          style="flex:1;background:var(--verde-claro);color:var(--verde-campo);border:1.5px solid var(--verde-borda);border-radius:6px;padding:6px;font-size:11px;font-weight:700;cursor:pointer">
+          🌱 Popular teste
+        </button>
+      </div>
+      <div id="seedLog-${e.id}" style="display:none;width:100%;background:#f0f7f3;border-radius:6px;padding:8px;font-size:10px;font-family:monospace;max-height:100px;overflow-y:auto;color:var(--verde-floresta)"></div>
     </div>`).join('');
 }
 
@@ -1470,23 +1477,9 @@ window.salvarUsuario = async function() {
 };
 
 // ─── SEED INTERNO ──────────────────────────────────────────────────
-window.rodarSeedInterno = async function() {
-  // Busca empresaId direto do Firestore (não da sessão em memória)
-  const perfilSnap = await getDoc(doc(db, 'usuarios', sessaoAtual.uid));
-  const empresaId  = perfilSnap.data()?.empresaId;
-
-  if (!empresaId) { alert('empresaId não encontrado no seu perfil.'); return; }
-
-  // Confirma com o usuário qual empresa vai popular
-  const empSnap = await getDoc(doc(db, 'empresas', empresaId));
-  const empNome = empSnap.exists() ? empSnap.data().nome : '(não encontrada)';
-
-  if (!confirm(`Vai popular a empresa:\n\n"${empNome}"\nID: ${empresaId}\n\nConfirma?`)) return;
-
-  const btn   = document.getElementById('btnSeed');
-  const logEl = document.getElementById('seedLog');
-  btn.disabled = true;
-  btn.textContent = '⏳ Populando...';
+window.seedEmpresa = async function(empresaId, empresaNome) {
+  const logEl = document.getElementById(`seedLog-${empresaId}`);
+  if (!logEl) return;
   logEl.style.display = 'block';
   logEl.innerHTML = '';
 
@@ -1528,35 +1521,32 @@ window.rodarSeedInterno = async function() {
   ];
 
   try {
-    log(`🏢 Empresa: ${empNome}`);
-    log(`🔑 ID: ${empresaId}`);
+    log(`🏢 ${empresaNome} (${empresaId})`);
     log(`📦 Criando ${PRODUTOS.length} produtos...`);
 
     for (const p of PRODUTOS) {
-      await addDoc(collection(db, 'empresas', empresaId, 'produtos'), {
-        ...p, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-      });
-      log(`✓ ${p.nome} — ${p.estoque} ${p.unidade}`);
+      await addDoc(
+        collection(db, 'empresas', empresaId, 'produtos'),
+        { ...p, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }
+      );
+      log(`✓ ${p.nome}`);
     }
 
-    // Atualiza sessão com empresaId correto
-    sessaoAtual.empresaId   = empresaId;
-    sessaoAtual.empresaNome = empNome;
-    if (unsubProdutos) { unsubProdutos(); unsubProdutos = null; }
-    iniciarListeners();
+    log(`✅ ${PRODUTOS.length} produtos criados!`);
 
-    log(`✅ Concluído! ${PRODUTOS.length} produtos criados.`);
-    btn.textContent  = '✅ Concluído!';
-    btn.style.background = 'var(--verde-campo)';
-    btn.style.color  = '#fff';
-    btn.style.border = 'none';
+    // Se esta é a empresa visualizada, atualiza os listeners
+    if (sessaoAtual.empresaId === empresaId) {
+      if (unsubProdutos) { unsubProdutos(); unsubProdutos = null; }
+      iniciarListeners();
+    }
 
   } catch(e) {
     log(`❌ Erro: ${e.message}`);
-    btn.disabled = false;
-    btn.textContent = '🌱 Tentar novamente';
   }
 };
+
+  if (!empresaId) { alert('empresaId não encontrado no seu perfil.'); return; }
+
 
 // ─── UTILITÁRIOS MODAL ─────────────────────────────────────────────
 window.abrirModal  = id => document.getElementById(id)?.classList.add('aberto');
