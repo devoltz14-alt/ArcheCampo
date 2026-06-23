@@ -551,7 +551,7 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
 <!-- ═══════════════════════════════════════════════════════════════════
      DASHBOARD
      ═══════════════════════════════════════════════════════════════════ -->
-<div class="tela-dash ativa" id="telaDash">
+<div class="tela-dash" id="telaDash">
   <div class="dash-saudacao">
     <h1 id="dashSaudacao">Bom dia!</h1>
     <p id="dashData"></p>
@@ -976,13 +976,12 @@ function iniciarSessao() {
         document.getElementById('headerEmpresa').style.display = 'block';
         iniciarListeners();
       }
-      renderDashboard();
+      navegarModulo('dashboard');
     });
   } else {
     iniciarListeners();
+    navegarModulo('dashboard');
   }
-
-  navegarModulo('dashboard');
 }
 
 function finalizarSessao() {
@@ -1009,8 +1008,16 @@ function iniciarListeners() {
 // ─── NAVEGAÇÃO ─────────────────────════════════════════════════════
 window.navegarModulo = function(modulo) {
   moduloAtivo = modulo;
-  ['dashboard','estoque','irrigacao','pluviometria'].forEach(m => {
-    const tela = document.getElementById('tela' + m.charAt(0).toUpperCase() + m.slice(1));
+
+  const telaIds = {
+    dashboard:    'telaDash',
+    estoque:      'telaEstoque',
+    irrigacao:    'telaIrrigacao',
+    pluviometria: 'telaPluv',
+  };
+
+  Object.keys(telaIds).forEach(m => {
+    const tela = document.getElementById(telaIds[m]);
     if (tela) tela.classList.toggle('ativa', m === modulo);
     const tab = document.getElementById('tab-' + m);
     if (tab) tab.classList.toggle('ativo', m === modulo);
