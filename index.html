@@ -571,6 +571,188 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
   .painel { width: 100%; }
   .produto-acoes .btn-menu { display: none; }
 }
+
+/* =====================================================================
+   RECEITA & COMPRAS — busca com autocomplete e cards de item
+   ===================================================================== */
+.rec-busca-wrap { position: relative; }
+.rec-sugestoes-lista {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--branco); border: 1.5px solid var(--verde-folha);
+  border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  max-height: 220px; overflow-y: auto; z-index: 50;
+}
+.rec-sugestao-item {
+  padding: 10px 14px; cursor: pointer;
+  border-bottom: 1px solid var(--verde-claro);
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+}
+.rec-sugestao-item:last-child { border-bottom: none; }
+.rec-sugestao-item:hover { background: var(--verde-claro); }
+.rec-sugestao-nome { font-size: 13px; font-weight: 700; color: var(--verde-floresta); }
+.rec-sugestao-info { font-size: 11px; color: var(--texto-suave); margin-top: 1px; }
+.rec-sugestao-estoque { font-size: 12px; font-weight: 700; color: var(--verde-campo); white-space: nowrap; }
+.rec-sugestao-item.zerado .rec-sugestao-nome { color: var(--vermelho); }
+.rec-sugestao-item.zerado .rec-sugestao-estoque { color: var(--vermelho); }
+
+.rec-item-card {
+  background: var(--verde-claro); border: 1.5px solid var(--verde-borda);
+  border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+}
+.rec-item-linha-principal { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rec-item-nome { flex: 1; min-width: 140px; font-size: 13px; font-weight: 700; color: var(--verde-floresta); }
+.rec-item-nome .rec-item-pa { display: block; font-size: 11px; color: var(--texto-suave); font-weight: 400; }
+.rec-item-qtd-input {
+  width: 90px; padding: 7px 10px; border: 1.5px solid var(--verde-borda);
+  border-radius: 8px; font-size: 14px; outline: none; background: var(--branco); text-align: center;
+}
+.rec-item-qtd-input:focus { border-color: var(--verde-folha); }
+.rec-item-qtd-input.erro { border-color: var(--vermelho); background: #fff5f5; }
+.rec-item-unidade { font-size: 12px; color: var(--texto-suave); min-width: 24px; }
+.rec-item-disponivel { font-size: 11px; color: var(--texto-suave); white-space: nowrap; }
+.rec-item-remover {
+  background: #fff0f0; color: var(--vermelho); border: 1px solid #fcc;
+  border-radius: 7px; width: 30px; height: 30px; cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.rec-item-remover:hover { background: #ffe0e0; }
+.rec-preview { font-size: 11px; color: var(--verde-campo); min-height: 14px; margin-top: 4px; padding-left: 2px; }
+.rec-preview.rec-preview-erro { color: var(--vermelho); }
+.rec-resumo-total { font-size: 11px; color: var(--texto-suave); text-align: right; margin-top: 6px; margin-bottom: 4px; }
+.btn-adicionar-mais {
+  width: 100%; background: var(--verde-claro); color: var(--verde-campo);
+  border: 1.5px dashed var(--verde-folha); border-radius: 8px;
+  padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px;
+}
+.btn-adicionar-mais:hover { background: var(--verde-borda); }
+
+/* =====================================================================
+   HISTÓRICO DE MOVIMENTAÇÕES
+   ===================================================================== */
+.hist-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(26,58,42,0.5); z-index: 700;
+  align-items: flex-start; justify-content: center;
+  padding: 20px; overflow-y: auto;
+}
+.hist-overlay.aberto { display: flex; }
+.hist-modal {
+  background: var(--branco); border-radius: 16px; width: 100%;
+  max-width: 780px; margin: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  overflow: hidden; display: flex; flex-direction: column; max-height: 90vh;
+}
+.hist-header {
+  background: var(--verde-floresta); color: var(--branco);
+  padding: 18px 22px; display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.hist-header h2 { font-size: 16px; font-weight: 800; }
+.hist-fechar {
+  background: rgba(255,255,255,0.15); border: none; color: var(--branco);
+  width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.hist-fechar:hover { background: rgba(255,255,255,0.25); }
+
+.hist-filtros {
+  display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 18px;
+  border-bottom: 1px solid var(--verde-borda); background: var(--verde-claro);
+  flex-shrink: 0;
+}
+.hist-busca {
+  flex: 1; min-width: 180px; border: 1.5px solid var(--verde-borda);
+  border-radius: 8px; padding: 7px 11px; font-size: 13px;
+  background: var(--branco); outline: none; color: var(--texto);
+}
+.hist-busca:focus { border-color: var(--verde-folha); }
+.hist-select {
+  border: 1.5px solid var(--verde-borda); border-radius: 8px;
+  padding: 7px 10px; font-size: 12px; background: var(--branco);
+  color: var(--texto); outline: none; cursor: pointer;
+}
+.hist-date {
+  border: 1.5px solid var(--verde-borda); border-radius: 8px;
+  padding: 7px 10px; font-size: 12px; background: var(--branco);
+  color: var(--texto); outline: none;
+}
+.hist-limpar {
+  background: var(--branco); color: var(--texto-suave);
+  border: 1.5px solid var(--borda); border-radius: 8px;
+  padding: 7px 12px; font-size: 12px; cursor: pointer; white-space: nowrap;
+}
+.hist-limpar:hover { background: var(--fundo); }
+
+.hist-body { overflow-y: auto; flex: 1; padding: 12px 18px; }
+
+/* Item de movimentação */
+.mov-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 11px 14px; border-radius: 10px; margin-bottom: 8px;
+  border: 1px solid var(--borda); background: var(--branco);
+  border-left: 4px solid var(--borda);
+}
+.mov-item.mov-entrada  { border-left-color: var(--verde-campo); background: #f5fbf7; }
+.mov-item.mov-baixa    { border-left-color: var(--vermelho);    background: #fdf5f5; }
+.mov-item.mov-receita  { border-left-color: #7a3fa8;            background: #faf5fd; }
+.mov-item.mov-compra   { border-left-color: var(--azul);        background: #f5f8fd; }
+
+.mov-icone {
+  width: 36px; height: 36px; border-radius: 50%; font-size: 15px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;
+}
+.mov-icone.entrada { background: #e0f5ea; color: var(--verde-campo); }
+.mov-icone.baixa   { background: #fdecea; color: var(--vermelho); }
+.mov-icone.receita { background: #f1e6f8; color: #7a3fa8; }
+.mov-icone.compra  { background: #e8eef8; color: var(--azul); }
+
+.mov-corpo { flex: 1; min-width: 0; }
+.mov-titulo { font-size: 13px; font-weight: 700; color: var(--verde-floresta); }
+.mov-meta   { font-size: 11px; color: var(--texto-suave); margin-top: 2px; }
+.mov-qtd    { font-size: 14px; font-weight: 800; white-space: nowrap; text-align: right; }
+.mov-qtd.entrada { color: var(--verde-campo); }
+.mov-qtd.baixa   { color: var(--vermelho); }
+.mov-qtd.receita { color: #7a3fa8; }
+.mov-qtd.compra  { color: var(--azul); }
+
+/* Itens de receita/compra expandíveis */
+.mov-itens-wrap { margin-top: 8px; }
+.mov-itens-toggle {
+  background: none; border: none; font-size: 11px; color: var(--texto-suave);
+  cursor: pointer; padding: 0; text-decoration: underline;
+}
+.mov-itens-lista { display: none; margin-top: 6px; }
+.mov-itens-lista.aberta { display: block; }
+.mov-prod-linha {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--fundo);
+}
+.mov-prod-linha:last-child { border-bottom: none; }
+.mov-prod-nome { font-weight: 600; color: var(--verde-floresta); }
+.mov-prod-qtd  { font-weight: 700; white-space: nowrap; }
+.mov-prod-qtd.neg { color: var(--vermelho); }
+.mov-prod-qtd.pos { color: var(--verde-campo); }
+
+/* Footer */
+.hist-footer {
+  padding: 12px 18px; border-top: 1px solid var(--verde-borda);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; flex-shrink: 0;
+  background: var(--verde-claro);
+}
+.hist-total { font-size: 12px; color: var(--texto-suave); }
+.hist-carregar-mais {
+  background: var(--branco); color: var(--verde-campo);
+  border: 1.5px solid var(--verde-campo); border-radius: 8px;
+  padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.hist-carregar-mais:hover { background: var(--verde-claro); }
+.hist-carregar-mais:disabled { opacity: 0.5; cursor: default; }
+.hist-vazio { text-align: center; padding: 40px; color: var(--texto-suave); font-size: 14px; }
+
+@media (max-width: 600px) {
+  .hist-filtros { flex-direction: column; }
+  .hist-date { width: 100%; }
+}
 </style>
 </head>
 <body>
@@ -640,6 +822,7 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
     <div class="header-empresa" id="headerEmpresa"></div>
     <div class="header-usuario" id="headerUsuario"></div>
     <button class="header-btn-ghost" id="btnAdmin" onclick="abrirAdmin()" style="display:none">⚙ Admin</button>
+    <button class="header-btn-ghost" onclick="abrirHistorico()">📋 Histórico</button>
     <button class="header-btn-ghost" onclick="fazerLogout()">Sair</button>
   </div>
 </header>
@@ -723,6 +906,7 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
     <div class="irrig-filtros">
       <select class="filtro-select" id="irrigFiltroMes" onchange="renderIrrig()"></select>
       <button class="btn-primario" onclick="abrirModalIrrig()">+ Lançamento</button>
+      <button class="btn-secundario" id="btnGestaoIrrig" onclick="abrirGestaoIrrig()" style="display:none">⚙️ Gestão</button>
     </div>
   </div>
 
@@ -787,7 +971,8 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
         <select class="campo-select" id="irrigSafra">
           <option value="25/26">25/26</option>
           <option value="26/26">26/26</option>
-          <option value="24/25">24/25</option>
+          <option value="26/27">26/27</option>
+          <option value="27/27">27/27</option>
         </select>
       </div>
     </div>
@@ -814,6 +999,97 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
     <div class="modal-acoes">
       <button class="btn-cancelar" onclick="fecharModal('modalIrrig')">Cancelar</button>
       <button class="btn-salvar" onclick="confirmarIrrig()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAINEL GESTÃO IRRIGAÇÃO -->
+<div class="painel-overlay" id="painelGestaoIrrig">
+  <div class="painel">
+    <div class="painel-titulo">
+      ⚙️ Gestão — Irrigação
+      <button class="painel-fechar" onclick="fecharGestaoIrrig()">✕</button>
+    </div>
+
+    <div class="painel-section">
+      <div class="painel-section-label">Fazendas e Pivôs</div>
+      <div id="gestaoIrrigLista" style="margin-bottom:12px"></div>
+      <button class="btn-primario" style="width:100%" onclick="abrirModalNovoPivo()">+ Novo Pivô</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO/EDITAR PIVÔ -->
+<div class="modal-overlay" id="modalPivo">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-titulo" id="modalPivoTitulo">Novo Pivô</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="campo-grupo">
+        <label class="campo-label">Fazenda</label>
+        <input class="campo-input" id="pivoFazenda" placeholder="Ex: VERDE CAMPO" style="text-transform:uppercase" />
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Nome do Pivô</label>
+        <input class="campo-input" id="pivoNome" placeholder="Ex: Pivô 1" />
+      </div>
+    </div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Tabela MM por Percentímetro</label>
+      <div style="font-size:11px;color:var(--texto-suave);margin-bottom:8px">Informe o MM para cada percentímetro (de 5% a 100%)</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px" id="pivoTabelaInputs"></div>
+    </div>
+
+    <div class="modal-erro" id="pivoErro"></div>
+    <div class="modal-acoes">
+      <button class="btn-cancelar" onclick="fecharModal('modalPivo')">Cancelar</button>
+      <button class="btn-salvar" onclick="salvarPivo()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR LANÇAMENTO IRRIGAÇÃO -->
+<div class="modal-overlay" id="modalIrrigEdit">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-titulo">✏️ Editar Lançamento</div>
+    <input type="hidden" id="irrigEditId" />
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="campo-grupo">
+        <label class="campo-label">Data</label>
+        <input class="campo-input" id="irrigEditData" type="date" />
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Cultura</label>
+        <select class="campo-select" id="irrigEditCultura">
+          <option value="🌱 Soja">🌱 Soja</option>
+          <option value="🌽 Milho">🌽 Milho</option>
+          <option value="🫛 Milho Verde">🫛 Milho Verde</option>
+          <option value="🫘 Feijão">🫘 Feijão</option>
+          <option value="🍚 Arroz">🍚 Arroz</option>
+          <option value="🌾 Trigo">🌾 Trigo</option>
+          <option value="🌻 Sorgo">🌻 Sorgo</option>
+          <option value="🥜 Amendoim">🥜 Amendoim</option>
+          <option value="☁️ Algodão">☁️ Algodão</option>
+          <option value="🌿 Pasto">🌿 Pasto</option>
+        </select>
+      </div>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Safra</label>
+      <select class="campo-select" id="irrigEditSafra">
+        <option value="25/26">25/26</option>
+        <option value="26/26">26/26</option>
+        <option value="26/27">26/27</option>
+        <option value="27/27">27/27</option>
+      </select>
+    </div>
+
+    <div class="modal-erro" id="irrigEditErro"></div>
+    <div class="modal-acoes">
+      <button class="btn-cancelar" onclick="fecharModal('modalIrrigEdit')">Cancelar</button>
+      <button class="btn-salvar" onclick="salvarEdicaoIrrig()">Salvar</button>
     </div>
   </div>
 </div>
@@ -1018,6 +1294,209 @@ nav.modulos-nav::-webkit-scrollbar { display: none; }
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL — HISTÓRICO DE MOVIMENTAÇÕES
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="hist-overlay" id="histOverlay" onclick="if(event.target===this)fecharHistorico()">
+  <div class="hist-modal">
+
+    <div class="hist-header">
+      <h2>📋 Histórico de Movimentações</h2>
+      <button class="hist-fechar" onclick="fecharHistorico()">×</button>
+    </div>
+
+    <div class="hist-filtros">
+      <input class="hist-busca" id="histBusca" placeholder="🔍 Produto, receita, responsável..."
+        oninput="filtrarHistorico()" />
+      <select class="hist-select" id="histTipo" onchange="filtrarHistorico()">
+        <option value="">Todos os tipos</option>
+        <option value="entrada">Entradas</option>
+        <option value="baixa">Baixas</option>
+        <option value="receita">Baixas com receita</option>
+        <option value="compra">Entradas por NF</option>
+      </select>
+      <input class="hist-date" id="histDe"  type="date" onchange="filtrarHistorico()" title="De" />
+      <input class="hist-date" id="histAte" type="date" onchange="filtrarHistorico()" title="Até" />
+      <button class="hist-limpar" onclick="limparFiltrosHistorico()">Limpar</button>
+    </div>
+
+    <div class="hist-body" id="histBody">
+      <div class="hist-vazio">Carregando...</div>
+    </div>
+
+    <div class="hist-footer">
+      <span class="hist-total" id="histTotal"></span>
+      <button class="hist-carregar-mais" id="btnHistMais" onclick="carregarMaisHistorico()" style="display:none">
+        Carregar mais
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL — BAIXA COM RECEITA
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalReceita" onclick="if(event.target===this)fecharReceita()">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-titulo">🧾 Baixa com Receita</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+      <div class="campo-grupo">
+        <label class="campo-label">Nº da Receita / Identificação *</label>
+        <input class="campo-input" id="recNumero" placeholder="Ex: REC-2026-001" />
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Responsável pela retirada *</label>
+        <input class="campo-input" id="recResp" placeholder="Nome do operador" />
+      </div>
+    </div>
+
+    <div class="campo-grupo">
+      <label class="campo-label">Adicionar produto</label>
+      <div class="rec-busca-wrap">
+        <input class="campo-input" id="recBuscaProduto"
+          placeholder="🔍 Digite o nome ou princípio ativo..."
+          oninput="buscarProdutoReceita()" autocomplete="off" />
+        <div id="recSugestoes"></div>
+      </div>
+    </div>
+
+    <div id="recItensVazio"
+      style="text-align:center;color:var(--texto-suave);padding:20px;font-size:13px;
+             background:var(--verde-claro);border-radius:10px;border:1.5px dashed var(--verde-borda);margin-bottom:12px">
+      Nenhum produto adicionado ainda. Use a busca acima.
+    </div>
+    <div id="recListaItens"></div>
+
+    <div class="campo-grupo" style="margin-top:4px">
+      <label class="campo-label">Observação (opcional)</label>
+      <input class="campo-input" id="recObs" placeholder="Ex: Aplicação talhão 3 — safra 25/26" />
+    </div>
+
+    <div class="modal-erro" id="recErro"></div>
+    <div class="modal-acoes">
+      <button class="btn-cancelar" onclick="fecharReceita()">Cancelar</button>
+      <button class="btn-salvar" id="btnConfirmarReceita" onclick="confirmarReceita()">
+        ✓ Confirmar Baixa da Receita
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL — ENTRADA DE COMPRAS (NF)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalCompra" onclick="if(event.target===this)fecharCompra()">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-titulo">📦 Entrada de Compras (NF)</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+      <div class="campo-grupo">
+        <label class="campo-label">Nº da Nota Fiscal *</label>
+        <input class="campo-input" id="compraNumero" placeholder="Ex: 12345" />
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Fornecedor</label>
+        <input class="campo-input" id="compraFornecedor" placeholder="Ex: Agronegócios Silva" />
+      </div>
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Responsável pelo lançamento *</label>
+      <input class="campo-input" id="compraResp" placeholder="Nome do operador" />
+    </div>
+
+    <div class="campo-grupo">
+      <label class="campo-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Adicionar produto</span>
+        <button onclick="abrirCadastroInlineCompra()"
+          style="font-size:11px;font-weight:700;background:var(--verde-claro);color:var(--verde-campo);
+                 border:1px dashed var(--verde-folha);border-radius:6px;padding:3px 10px;cursor:pointer">
+          + Cadastrar produto agora
+        </button>
+      </label>
+      <div class="rec-busca-wrap">
+        <input class="campo-input" id="compraBuscaProduto"
+          placeholder="🔍 Digite o nome ou princípio ativo..."
+          oninput="buscarProdutoCompra()" autocomplete="off" />
+        <div id="compraSugestoes"></div>
+      </div>
+    </div>
+
+    <div id="compraItensVazio"
+      style="text-align:center;color:var(--texto-suave);padding:20px;font-size:13px;
+             background:var(--verde-claro);border-radius:10px;border:1.5px dashed var(--verde-borda);margin-bottom:12px">
+      Nenhum produto adicionado ainda. Use a busca acima.
+    </div>
+    <div id="compraListaItens"></div>
+
+    <div class="campo-grupo" style="margin-top:4px">
+      <label class="campo-label">Observação (opcional)</label>
+      <input class="campo-input" id="compraObs" placeholder="Ex: Compra safra 25/26" />
+    </div>
+
+    <div class="modal-erro" id="compraErro"></div>
+    <div class="modal-acoes">
+      <button class="btn-cancelar" onclick="fecharCompra()">Cancelar</button>
+      <button class="btn-salvar" id="btnConfirmarCompra" onclick="confirmarCompra()">
+        ✓ Confirmar Entrada da Nota Fiscal
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL — CADASTRO INLINE DE PRODUTO (dentro de Compras)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalCadastroInline" onclick="if(event.target===this)fecharCadastroInlineCompra()" style="z-index:800">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-titulo">📋 Cadastrar Produto</div>
+    <p style="font-size:12px;color:var(--texto-suave);margin-bottom:16px;margin-top:-10px">
+      O produto será cadastrado com estoque 0 e adicionado automaticamente à nota fiscal em andamento.
+    </p>
+    <div class="campo-grupo">
+      <label class="campo-label">Nome do produto *</label>
+      <input class="campo-input" id="cicNome" placeholder="Ex: Roundup WG" />
+    </div>
+    <div class="campo-grupo">
+      <label class="campo-label">Princípio Ativo</label>
+      <input class="campo-input" id="cicPa" placeholder="Ex: Glifosato" />
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="campo-grupo">
+        <label class="campo-label">Classe</label>
+        <select class="campo-select" id="cicClasse">
+          <option value="ADJUVANTE">Adjuvante</option>
+          <option value="BIOLÓGICO">Biológico</option>
+          <option value="FOLIAR">Foliar</option>
+          <option value="FUNGICIDA">Fungicida</option>
+          <option value="HERBICIDA" selected>Herbicida</option>
+          <option value="INSETICIDA">Inseticida</option>
+          <option value="MEIO DE CULTURA">Meio de Cultura</option>
+          <option value="MOLUSCICIDA">Moluscicida</option>
+          <option value="OLEO">Óleo</option>
+        </select>
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Unidade</label>
+        <select class="campo-select" id="cicUnidade">
+          <option value="L" selected>Litros (L)</option>
+          <option value="KG">Quilos (KG)</option>
+          <option value="UN">Unidades (UN)</option>
+          <option value="SC">Sacos (SC)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-erro" id="cicErro"></div>
+    <div class="modal-acoes">
+      <button class="btn-cancelar" onclick="fecharCadastroInlineCompra()">Cancelar</button>
+      <button class="btn-salvar" id="btnConfirmarCadastroInline" onclick="confirmarCadastroInlineCompra()">
+        ✓ Cadastrar e Adicionar à NF
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- SheetJS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -1033,7 +1512,8 @@ import { getAuth as getAuthSecundario, createUserWithEmailAndPassword }
 import { getFirestore, initializeFirestore, persistentLocalCache,
          persistentMultipleTabManager, collection, doc, getDoc, getDocs,
          setDoc, addDoc, updateDoc, deleteDoc, onSnapshot,
-         query, orderBy, limit, where, increment, runTransaction, serverTimestamp }
+         query, orderBy, limit, where, increment, runTransaction,
+         serverTimestamp, startAfter }
                                    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1125,7 +1605,9 @@ document.getElementById('loginSenha').addEventListener('keydown', e => {
 
 window.fazerLogout = async function() {
   try { localStorage.removeItem('arche_sessao'); } catch(e) {}
-  if (unsubProdutos) { unsubProdutos(); unsubProdutos = null; }
+  if (unsubProdutos)      { unsubProdutos(); unsubProdutos = null; }
+  if (unsubDashHistorico) { unsubDashHistorico(); unsubDashHistorico = null; }
+  if (unsubHistorico)     { unsubHistorico(); unsubHistorico = null; }
   sessaoAtual = null; produtos = []; historico = [];
   document.body.classList.remove('app-pronto');
   const overlay = document.getElementById('loginOverlay');
@@ -1204,7 +1686,9 @@ function iniciarSessao() {
 
 function finalizarSessao() {
   try { localStorage.removeItem('arche_sessao'); } catch(e) {}
-  if (unsubProdutos) { unsubProdutos(); unsubProdutos = null; }
+  if (unsubProdutos)      { unsubProdutos(); unsubProdutos = null; }
+  if (unsubDashHistorico) { unsubDashHistorico(); unsubDashHistorico = null; }
+  if (unsubHistorico)     { unsubHistorico(); unsubHistorico = null; }
   sessaoAtual = null; produtos = []; historico = [];
   document.body.classList.remove('app-pronto');
   const overlay = document.getElementById('loginOverlay');
@@ -1213,19 +1697,33 @@ function finalizarSessao() {
 }
 
 // ─── LISTENERS ─────────────────────────────────────────────────────
+let unsubDashHistorico = null;
+
 function iniciarListeners() {
   if (unsubProdutos) unsubProdutos();
-  console.log('[DEBUG] iniciarListeners — empresaId:', sessaoAtual?.empresaId);
+  if (unsubDashHistorico) { unsubDashHistorico(); unsubDashHistorico = null; }
+
+  // Listener de produtos
   const q = collection(db, 'empresas', sessaoAtual.empresaId, 'produtos');
   unsubProdutos = onSnapshot(q, snap => {
-    console.log('[DEBUG] snapshot produtos — total:', snap.docs.length);
     produtos = snap.docs
       .map(d => ({ id: d.id, ...d.data() }))
       .sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'));
     renderLista();
     renderDashboard();
   }, err => {
-    console.error('[DEBUG] erro snapshot:', err);
+    console.error('[DEBUG] erro snapshot produtos:', err);
+  });
+
+  // Listener leve de histórico para o dashboard (últimos 5)
+  const qHist = query(
+    collection(db, 'empresas', sessaoAtual.empresaId, 'historico'),
+    orderBy('dataLocal', 'desc'),
+    limit(5)
+  );
+  unsubDashHistorico = onSnapshot(qHist, snap => {
+    const ultimas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderDashMovs(ultimas);
   });
 }
 
@@ -1317,9 +1815,7 @@ function renderDashboard() {
       }).join('');
   }
 
-  // Movimentações
-  const secMovs = document.getElementById('dashMovs');
-  secMovs.innerHTML = `<div class="dash-section-title">🔄 Últimas movimentações</div><div class="dash-vazio">Nenhuma movimentação ainda</div>`;
+  // Movimentações — renderDashMovs é chamado pelo listener de histórico em tempo real
 
   // Irrigação
   const secIrrig = document.getElementById('dashIrrig');
@@ -1527,9 +2023,674 @@ window.confirmarBaixa = async function() {
   }
 };
 
-// Placeholders para baixa com receita e entrada NF
-window.abrirBaixaReceita = function() { alert('Em breve: Baixa com Receita'); };
-window.abrirEntradaNF    = function() { alert('Em breve: Entrada de Compras (NF)'); };
+// ══════════════════════════════════════════════════════════════════════
+// HISTÓRICO DE MOVIMENTAÇÕES
+// ══════════════════════════════════════════════════════════════════════
+let histDocs        = [];   // lista carregada (página atual)
+let histUltimoDoc   = null; // cursor para paginação
+let histTemMais     = false;
+let histFiltrados   = [];   // resultado após filtros locais
+let unsubHistorico  = null;
+
+const HIST_LIMITE   = 60;
+
+// Ícone e classe por tipo
+function histMeta(tipo) {
+  switch(tipo) {
+    case 'entrada': return { icone: '➕', cls: 'entrada', label: 'Entrada' };
+    case 'baixa':   return { icone: '➖', cls: 'baixa',   label: 'Baixa' };
+    case 'receita': return { icone: '🧾', cls: 'receita', label: 'Baixa c/ Receita' };
+    case 'compra':  return { icone: '📦', cls: 'compra',  label: 'Entrada NF' };
+    default:        return { icone: '📄', cls: 'entrada', label: tipo || '—' };
+  }
+}
+
+function histDataFmt(doc) {
+  const ts = doc.dataLocal || (doc.data?.seconds ? doc.data.seconds * 1000 : null);
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString('pt-BR', {
+    day: '2-digit', month: '2-digit', year: '2-digit',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+window.abrirHistorico = function() {
+  document.getElementById('histOverlay').classList.add('aberto');
+  // Primeira carga — inicia listener em tempo real (só os mais recentes)
+  if (histDocs.length === 0) carregarHistorico(true);
+};
+
+window.fecharHistorico = function() {
+  document.getElementById('histOverlay').classList.remove('aberto');
+  // Para o listener quando fecha (economiza leituras)
+  if (unsubHistorico) { unsubHistorico(); unsubHistorico = null; }
+  histDocs = []; histUltimoDoc = null; histTemMais = false; histFiltrados = [];
+};
+
+async function carregarHistorico(reiniciar = false) {
+  if (reiniciar) {
+    histDocs = []; histUltimoDoc = null; histTemMais = false;
+    // Para listener anterior se existir
+    if (unsubHistorico) { unsubHistorico(); unsubHistorico = null; }
+  }
+
+  const body = document.getElementById('histBody');
+  if (reiniciar) body.innerHTML = '<div class="hist-vazio">Carregando...</div>';
+
+  // Usa onSnapshot só para o topo (detecta novos lançamentos em tempo real)
+  const qTop = query(colRef('historico'), orderBy('dataLocal', 'desc'), limit(1));
+  unsubHistorico = onSnapshot(qTop, async () => {
+    // Ao detectar mudança, recarrega a primeira página
+    await _buscarPaginaHistorico(true);
+    renderHistorico();
+  });
+}
+
+async function _buscarPaginaHistorico(reiniciar = false) {
+  try {
+    let q;
+    if (reiniciar || !histUltimoDoc) {
+      q = query(colRef('historico'), orderBy('dataLocal', 'desc'), limit(HIST_LIMITE));
+      histDocs = [];
+    } else {
+        q = query(colRef('historico'), orderBy('dataLocal', 'desc'), startAfter(histUltimoDoc), limit(HIST_LIMITE));
+    }
+    const snap = await getDocs(q);
+    const novos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (reiniciar) histDocs = novos;
+    else histDocs = [...histDocs, ...novos];
+    histUltimoDoc = snap.docs[snap.docs.length - 1] || histUltimoDoc;
+    histTemMais   = snap.docs.length === HIST_LIMITE;
+  } catch(e) {
+    console.error('Erro ao carregar histórico:', e);
+  }
+}
+
+window.carregarMaisHistorico = async function() {
+  const btn = document.getElementById('btnHistMais');
+  btn.disabled = true; btn.textContent = 'Carregando...';
+  await _buscarPaginaHistorico(false);
+  renderHistorico();
+  btn.disabled = false; btn.textContent = 'Carregar mais';
+};
+
+window.filtrarHistorico = function() { renderHistorico(); };
+
+window.limparFiltrosHistorico = function() {
+  document.getElementById('histBusca').value = '';
+  document.getElementById('histTipo').value  = '';
+  document.getElementById('histDe').value    = '';
+  document.getElementById('histAte').value   = '';
+  renderHistorico();
+};
+
+function renderHistorico() {
+  const busca = (document.getElementById('histBusca')?.value || '').toLowerCase();
+  const tipo  = document.getElementById('histTipo')?.value  || '';
+  const de    = document.getElementById('histDe')?.value    || '';
+  const ate   = document.getElementById('histAte')?.value   || '';
+
+  histFiltrados = histDocs.filter(m => {
+    if (tipo && m.tipo !== tipo) return false;
+    if (de || ate) {
+      const ts = m.dataLocal || (m.data?.seconds ? m.data.seconds * 1000 : null);
+      if (!ts) return true;
+      const data = new Date(ts);
+      const dStr = data.toISOString().slice(0, 10);
+      if (de  && dStr < de)  return false;
+      if (ate && dStr > ate) return false;
+    }
+    if (busca) {
+      const textos = [
+        m.produto || '',
+        m.numeroReceita || '',
+        m.numeroNF || '',
+        m.resp || '',
+        m.responsavel || '',
+        m.fornecedor || '',
+        m.nomeUsuario || '',
+        ...(m.itens || []).map(i => i.produto || '')
+      ].join(' ').toLowerCase();
+      if (!textos.includes(busca)) return false;
+    }
+    return true;
+  });
+
+  const body = document.getElementById('histBody');
+  if (histFiltrados.length === 0) {
+    body.innerHTML = '<div class="hist-vazio">Nenhuma movimentação encontrada.</div>';
+  } else {
+    body.innerHTML = histFiltrados.map(m => renderMovItem(m)).join('');
+  }
+
+  // Footer
+  const total = document.getElementById('histTotal');
+  if (total) {
+    const exibindo = histFiltrados.length;
+    const carregados = histDocs.length;
+    total.textContent = `Exibindo ${exibindo} de ${carregados} carregados`;
+  }
+  const btnMais = document.getElementById('btnHistMais');
+  if (btnMais) btnMais.style.display = histTemMais ? 'inline-block' : 'none';
+}
+
+function renderMovItem(m) {
+  const meta    = histMeta(m.tipo);
+  const dataStr = histDataFmt(m);
+  const isMulti = m.tipo === 'receita' || m.tipo === 'compra';
+
+  // Linha de qtd / identificação
+  let qtdHtml = '';
+  if (isMulti) {
+    const total = m.totalItens || (m.itens || []).length;
+    qtdHtml = `<div class="mov-qtd ${meta.cls}">${total} produto${total !== 1 ? 's' : ''}</div>`;
+  } else {
+    const sinal = m.tipo === 'entrada' || m.tipo === 'compra' ? '+' : '−';
+    qtdHtml = `<div class="mov-qtd ${meta.cls}">${sinal}${fmt(m.qtd || 0)} ${m.unidade || ''}</div>`;
+  }
+
+  // Subtítulo
+  let sub = '';
+  if (m.tipo === 'receita') sub = `Receita ${m.numeroReceita || ''} · ${m.resp || ''}`;
+  else if (m.tipo === 'compra') sub = `NF ${m.numeroNF || ''} · ${m.fornecedor ? m.fornecedor + ' · ' : ''}${m.resp || ''}`;
+  else if (m.tipo === 'entrada') sub = `${m.nomeUsuario || m.usuario || ''}${m.obs ? ' · ' + m.obs : ''}`;
+  else if (m.tipo === 'baixa') sub = `Resp.: ${m.responsavel || '—'}${m.obs ? ' · ' + m.obs : ''}`;
+
+  // Itens expandíveis para receita/compra
+  let itensHtml = '';
+  if (isMulti && m.itens && m.itens.length > 0) {
+    const clsQtd = m.tipo === 'receita' ? 'neg' : 'pos';
+    const sinalQtd = m.tipo === 'receita' ? '−' : '+';
+    const linhas = m.itens.map(it => `
+      <div class="mov-prod-linha">
+        <span class="mov-prod-nome">${esc(it.produto || '')}
+          ${it.classe ? `<span style="font-size:10px;color:var(--texto-suave);font-weight:400"> · ${esc(it.classe)}</span>` : ''}
+        </span>
+        <span class="mov-prod-qtd ${clsQtd}">${sinalQtd}${fmt(it.qtd)} ${esc(it.unidade || '')}</span>
+      </div>`).join('');
+    itensHtml = `
+      <div class="mov-itens-wrap">
+        <button class="mov-itens-toggle" onclick="toggleItensHist(this)">▶ Ver produtos</button>
+        <div class="mov-itens-lista">${linhas}</div>
+      </div>`;
+  }
+
+  // Produto principal (para tipos simples)
+  const tituloPrincipal = isMulti
+    ? `<span class="mov-titulo">${meta.label}${m.tipo === 'receita' && m.numeroReceita ? ` — ${esc(m.numeroReceita)}` : m.tipo === 'compra' && m.numeroNF ? ` — NF ${esc(m.numeroNF)}` : ''}</span>`
+    : `<span class="mov-titulo">${esc(m.produto || '—')}</span>`;
+
+  return `
+    <div class="mov-item mov-${meta.cls}">
+      <div class="mov-icone ${meta.cls}">${meta.icone}</div>
+      <div class="mov-corpo">
+        ${tituloPrincipal}
+        <div class="mov-meta">${dataStr}${sub ? ' · ' + esc(sub) : ''}</div>
+        ${itensHtml}
+      </div>
+      ${qtdHtml}
+    </div>`;
+}
+
+window.toggleItensHist = function(btn) {
+  const lista = btn.nextElementSibling;
+  const aberta = lista.classList.toggle('aberta');
+  btn.textContent = aberta ? '▼ Ocultar produtos' : '▶ Ver produtos';
+};
+
+// Atualiza dashMovs com as últimas 5 movimentações em tempo real
+function renderDashMovs(lista) {
+  const sec = document.getElementById('dashMovs');
+  if (!sec) return;
+  if (!lista || lista.length === 0) {
+    sec.innerHTML = `<div class="dash-section-title">🔄 Últimas movimentações</div>
+      <div class="dash-vazio">Nenhuma movimentação ainda</div>`;
+    return;
+  }
+  const ultimas = lista.slice(0, 5);
+  const itens = ultimas.map(m => {
+    const meta = histMeta(m.tipo);
+    const ts = m.dataLocal || (m.data?.seconds ? m.data.seconds * 1000 : null);
+    const dataFmt = ts ? new Date(ts).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) : '—';
+    const descricao = m.tipo === 'receita' ? `Receita ${m.numeroReceita || ''}` :
+                      m.tipo === 'compra'  ? `NF ${m.numeroNF || ''}` :
+                      m.produto || '—';
+    return `<div class="alerta-item">
+      <span class="alerta-nome" style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px">${meta.icone}</span>
+        ${esc(descricao)}
+      </span>
+      <span style="font-size:11px;color:var(--texto-suave)">${dataFmt}</span>
+    </div>`;
+  }).join('');
+  sec.innerHTML = `<div class="dash-section-title">🔄 Últimas movimentações</div>${itens}
+    <div style="margin-top:10px;text-align:right">
+      <button onclick="abrirHistorico()" style="font-size:11px;background:none;border:none;color:var(--verde-campo);cursor:pointer;font-weight:700;text-decoration:underline">Ver tudo →</button>
+    </div>`;
+}
+
+// ─── TOAST ─────────────────────────────────────────────────────────
+let _toastTimer;
+function mostrarToast(msg, tipo = '') {
+  let toast = document.getElementById('appToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'appToast';
+    toast.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+      background:#1a2e22;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;
+      z-index:9999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.3);`;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.background = tipo === 'sucesso' ? '#2d6a4f' : tipo === 'erro' ? '#e63946' : '#1a2e22';
+  clearTimeout(_toastTimer);
+  setTimeout(() => { toast.style.transform = 'translateX(-50%) translateY(0)'; }, 10);
+  _toastTimer = setTimeout(() => { toast.style.transform = 'translateX(-50%) translateY(80px)'; }, 3200);
+}
+
+// ─── MODAL HELPERS ─────────────────────────────────────────────────
+function abrirModal(id) { document.getElementById(id)?.classList.add('aberto'); }
+function fecharModal(id) { document.getElementById(id)?.classList.remove('aberto'); }
+
+// ─── HELPER ────────────────────────────────────────────────────────
+function parseQtd(v) {
+  if (typeof v === 'number') return v;
+  return parseFloat(String(v).replace(',', '.'));
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// BAIXA COM RECEITA (multi-produto)
+// ══════════════════════════════════════════════════════════════════════
+let receitaItens = [];
+
+window.abrirBaixaReceita = function() {
+  receitaItens = [];
+  document.getElementById('recNumero').value = '';
+  document.getElementById('recResp').value   = sessaoAtual?.nome || '';
+  document.getElementById('recObs').value    = '';
+  document.getElementById('recBuscaProduto').value = '';
+  document.getElementById('recSugestoes').innerHTML = '';
+  document.getElementById('recErro').textContent = '';
+  renderItensReceita();
+  abrirModal('modalReceita');
+  setTimeout(() => document.getElementById('recNumero').focus(), 80);
+};
+
+window.fecharReceita = function() {
+  fecharModal('modalReceita');
+  receitaItens = [];
+};
+
+window.buscarProdutoReceita = function() {
+  const termo = (document.getElementById('recBuscaProduto').value || '').trim().toLowerCase();
+  const caixa = document.getElementById('recSugestoes');
+  if (!termo) { caixa.innerHTML = ''; return; }
+
+  const jaAdicionados = new Set(receitaItens.map(i => String(i.produtoId)));
+  const candidatos = produtos
+    .filter(p =>
+      !jaAdicionados.has(String(p.id)) &&
+      ((p.nome || '').toLowerCase().includes(termo) ||
+       (p.principioAtivo || '').toLowerCase().includes(termo))
+    ).slice(0, 8);
+
+  if (candidatos.length === 0) {
+    caixa.innerHTML = `<div class="rec-sugestoes-lista">
+      <div class="rec-sugestao-item" style="cursor:default;color:var(--texto-suave)">Nenhum produto encontrado</div>
+    </div>`;
+    return;
+  }
+  caixa.innerHTML = `<div class="rec-sugestoes-lista">${candidatos.map(p => {
+    const zerado = (p.estoque ?? 0) <= 0;
+    return `<div class="rec-sugestao-item ${zerado ? 'zerado' : ''}" onclick="adicionarItemReceita('${p.id}')">
+      <div>
+        <div class="rec-sugestao-nome">${esc(p.nome)}</div>
+        <div class="rec-sugestao-info">${esc(p.principioAtivo || '')}</div>
+      </div>
+      <div class="rec-sugestao-estoque">${fmt(p.estoque ?? 0)} ${esc(p.unidade || '')}</div>
+    </div>`;
+  }).join('')}</div>`;
+};
+
+window.adicionarItemReceita = function(produtoId) {
+  const p = produtos.find(x => String(x.id) === String(produtoId));
+  if (!p) return;
+  if ((p.estoque ?? 0) <= 0) { mostrarToast(`"${p.nome}" está com estoque zerado.`, 'erro'); return; }
+  receitaItens.push({
+    produtoId: p.id, nome: p.nome,
+    pa: p.principioAtivo || '', unidade: p.unidade || 'UN',
+    estoqueDisponivel: p.estoque ?? 0, qtd: ''
+  });
+  document.getElementById('recBuscaProduto').value = '';
+  document.getElementById('recSugestoes').innerHTML = '';
+  renderItensReceita();
+  setTimeout(() => {
+    const input = document.getElementById(`rec-qtd-${receitaItens.length - 1}`);
+    if (input) input.focus();
+  }, 60);
+};
+
+window.removerItemReceita = function(idx) {
+  receitaItens.splice(idx, 1);
+  renderItensReceita();
+};
+
+window.atualizarQtdReceita = function(idx, valor) {
+  receitaItens[idx].qtd = valor;
+  const item      = receitaItens[idx];
+  const input     = document.getElementById(`rec-qtd-${idx}`);
+  const previewEl = document.getElementById(`rec-preview-${idx}`);
+  const qtdNum    = parseQtd(valor);
+  if (input) {
+    if (qtdNum > item.estoqueDisponivel) input.classList.add('erro');
+    else input.classList.remove('erro');
+  }
+  if (previewEl) {
+    if (!valor || isNaN(qtdNum) || qtdNum <= 0) { previewEl.textContent = ''; return; }
+    const apos = Math.round((item.estoqueDisponivel - qtdNum) * 100) / 100;
+    if (qtdNum > item.estoqueDisponivel) {
+      previewEl.innerHTML = `⚠️ quantidade maior que o disponível`;
+      previewEl.classList.add('rec-preview-erro');
+    } else {
+      previewEl.innerHTML = `Estoque após: <strong>${fmt(apos)} ${item.unidade}</strong>`;
+      previewEl.classList.remove('rec-preview-erro');
+    }
+  }
+};
+
+function renderItensReceita() {
+  const vazio = document.getElementById('recItensVazio');
+  const lista  = document.getElementById('recListaItens');
+  if (receitaItens.length === 0) { vazio.style.display = 'block'; lista.innerHTML = ''; return; }
+  vazio.style.display = 'none';
+  lista.innerHTML = receitaItens.map((item, idx) => `
+    <div class="rec-item-card">
+      <div class="rec-item-linha-principal">
+        <div class="rec-item-nome">${esc(item.nome)}<span class="rec-item-pa">${esc(item.pa)}</span></div>
+        <input type="number" class="rec-item-qtd-input" id="rec-qtd-${idx}"
+          min="0.1" step="0.5" placeholder="Qtd" value="${item.qtd}"
+          oninput="atualizarQtdReceita(${idx}, this.value)">
+        <span class="rec-item-unidade">${esc(item.unidade)}</span>
+        <span class="rec-item-disponivel">disp.: ${fmt(item.estoqueDisponivel)}</span>
+        <button class="rec-item-remover" onclick="removerItemReceita(${idx})">✕</button>
+      </div>
+      <div class="rec-preview" id="rec-preview-${idx}"></div>
+    </div>
+  `).join('') + `
+    <div class="rec-resumo-total">${receitaItens.length} produto${receitaItens.length !== 1 ? 's' : ''} na receita</div>
+    <button type="button" class="btn-adicionar-mais"
+      onclick="document.getElementById('recBuscaProduto').focus()">+ Adicionar mais produtos</button>
+  `;
+  receitaItens.forEach((item, idx) => { if (item.qtd) window.atualizarQtdReceita(idx, item.qtd); });
+}
+
+window.confirmarReceita = async function() {
+  const numero = document.getElementById('recNumero').value.trim();
+  const resp   = document.getElementById('recResp').value.trim();
+  const obs    = document.getElementById('recObs').value.trim();
+  const erroEl = document.getElementById('recErro');
+  erroEl.textContent = '';
+
+  if (!numero)               { erroEl.textContent = 'Informe a identificação da receita.'; return; }
+  if (!resp)                 { erroEl.textContent = 'Informe o responsável.'; return; }
+  if (receitaItens.length === 0) { erroEl.textContent = 'Adicione ao menos um produto.'; return; }
+  for (const item of receitaItens) {
+    const qtd = parseQtd(item.qtd);
+    if (!qtd || qtd <= 0)             { erroEl.textContent = `Informe a quantidade de "${item.nome}".`; return; }
+    if (qtd > item.estoqueDisponivel) { erroEl.textContent = `Qtd de "${item.nome}" maior que o disponível.`; return; }
+  }
+
+  const btn = document.getElementById('btnConfirmarReceita');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  try {
+    const itensFinais = [];
+    for (const item of receitaItens) {
+      const qtd = parseQtd(item.qtd);
+      const estoqueApos = await runTransaction(db, async tx => {
+        const ref  = docRef('produtos', item.produtoId);
+        const snap = await tx.get(ref);
+        if (!snap.exists()) throw new Error(`Produto "${item.nome}" não encontrado.`);
+        const atual = Math.round((snap.data().estoque || 0) * 100) / 100;
+        if (atual < qtd) throw Object.assign(
+          new Error(`Estoque insuficiente para "${item.nome}".`),
+          { code: 'ESTOQUE_INSUFICIENTE', produto: item.nome, atual }
+        );
+        tx.update(ref, { estoque: increment(-qtd) });
+        return Math.round((atual - qtd) * 100) / 100;
+      });
+      const p = produtos.find(x => String(x.id) === String(item.produtoId));
+      itensFinais.push({ produtoId: item.produtoId, produto: item.nome,
+        classe: p?.classe || '', qtd, unidade: item.unidade, estoqueApos });
+    }
+    await addDoc(colRef('historico'), {
+      tipo: 'receita', numeroReceita: numero, resp, obs,
+      itens: itensFinais, totalItens: itensFinais.length,
+      usuario: sessaoAtual.email, nomeUsuario: sessaoAtual.nome || sessaoAtual.email,
+      dataLocal: Date.now(), data: serverTimestamp()
+    });
+    window.fecharReceita();
+    mostrarToast(`✓ Receita "${numero}" registrada (${itensFinais.length} produto${itensFinais.length !== 1 ? 's' : ''})!`, 'sucesso');
+  } catch(e) {
+    console.error(e);
+    if (e.code === 'ESTOQUE_INSUFICIENTE') {
+      erroEl.textContent = `Estoque insuficiente para "${e.produto}". Disponível: ${fmt(e.atual)}.`;
+    } else {
+      erroEl.textContent = 'Erro ao registrar. Tente novamente.';
+    }
+  } finally {
+    btn.disabled = false; btn.textContent = '✓ Confirmar Baixa da Receita';
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// ENTRADA DE COMPRAS / NOTA FISCAL (multi-produto)
+// ══════════════════════════════════════════════════════════════════════
+let compraItens = [];
+
+window.abrirEntradaNF = function() {
+  compraItens = [];
+  document.getElementById('compraNumero').value     = '';
+  document.getElementById('compraFornecedor').value = '';
+  document.getElementById('compraResp').value       = sessaoAtual?.nome || '';
+  document.getElementById('compraObs').value        = '';
+  document.getElementById('compraBuscaProduto').value  = '';
+  document.getElementById('compraSugestoes').innerHTML = '';
+  document.getElementById('compraErro').textContent = '';
+  renderItensCompra();
+  abrirModal('modalCompra');
+  setTimeout(() => document.getElementById('compraNumero').focus(), 80);
+};
+
+window.fecharCompra = function() {
+  fecharModal('modalCompra');
+  compraItens = [];
+};
+
+window.buscarProdutoCompra = function() {
+  const termo = (document.getElementById('compraBuscaProduto').value || '').trim().toLowerCase();
+  const caixa = document.getElementById('compraSugestoes');
+  if (!termo) { caixa.innerHTML = ''; return; }
+
+  const jaAdicionados = new Set(compraItens.map(i => String(i.produtoId)));
+  const candidatos = produtos
+    .filter(p =>
+      !jaAdicionados.has(String(p.id)) &&
+      ((p.nome || '').toLowerCase().includes(termo) ||
+       (p.principioAtivo || '').toLowerCase().includes(termo))
+    ).slice(0, 8);
+
+  if (candidatos.length === 0) {
+    caixa.innerHTML = `<div class="rec-sugestoes-lista">
+      <div class="rec-sugestao-item" style="cursor:default;color:var(--texto-suave)">
+        Produto não encontrado — use "Cadastrar produto agora"
+      </div></div>`;
+    return;
+  }
+  caixa.innerHTML = `<div class="rec-sugestoes-lista">${candidatos.map(p => `
+    <div class="rec-sugestao-item" onclick="adicionarItemCompra('${p.id}')">
+      <div>
+        <div class="rec-sugestao-nome">${esc(p.nome)}</div>
+        <div class="rec-sugestao-info">${esc(p.principioAtivo || '')}</div>
+      </div>
+      <div class="rec-sugestao-estoque">${fmt(p.estoque ?? 0)} ${esc(p.unidade || '')}</div>
+    </div>
+  `).join('')}</div>`;
+};
+
+window.adicionarItemCompra = function(produtoId) {
+  const p = produtos.find(x => String(x.id) === String(produtoId));
+  if (!p) return;
+  compraItens.push({
+    produtoId: p.id, nome: p.nome,
+    pa: p.principioAtivo || '', unidade: p.unidade || 'UN',
+    estoqueAtual: p.estoque ?? 0, qtd: ''
+  });
+  document.getElementById('compraBuscaProduto').value  = '';
+  document.getElementById('compraSugestoes').innerHTML = '';
+  renderItensCompra();
+  setTimeout(() => {
+    const input = document.getElementById(`compra-qtd-${compraItens.length - 1}`);
+    if (input) input.focus();
+  }, 60);
+};
+
+window.removerItemCompra = function(idx) {
+  compraItens.splice(idx, 1);
+  renderItensCompra();
+};
+
+window.atualizarQtdCompra = function(idx, valor) {
+  compraItens[idx].qtd = valor;
+  const item      = compraItens[idx];
+  const previewEl = document.getElementById(`compra-preview-${idx}`);
+  const qtdNum    = parseQtd(valor);
+  if (previewEl) {
+    if (!valor || isNaN(qtdNum) || qtdNum <= 0) { previewEl.textContent = ''; return; }
+    const apos = Math.round((item.estoqueAtual + qtdNum) * 100) / 100;
+    previewEl.innerHTML = `Estoque após: <strong>${fmt(apos)} ${item.unidade}</strong>`;
+    previewEl.classList.remove('rec-preview-erro');
+  }
+};
+
+function renderItensCompra() {
+  const vazio = document.getElementById('compraItensVazio');
+  const lista  = document.getElementById('compraListaItens');
+  if (compraItens.length === 0) { vazio.style.display = 'block'; lista.innerHTML = ''; return; }
+  vazio.style.display = 'none';
+  lista.innerHTML = compraItens.map((item, idx) => `
+    <div class="rec-item-card">
+      <div class="rec-item-linha-principal">
+        <div class="rec-item-nome">${esc(item.nome)}<span class="rec-item-pa">${esc(item.pa)}</span></div>
+        <input type="number" class="rec-item-qtd-input" id="compra-qtd-${idx}"
+          min="0.1" step="0.5" placeholder="Qtd" value="${item.qtd}"
+          oninput="atualizarQtdCompra(${idx}, this.value)">
+        <span class="rec-item-unidade">${esc(item.unidade)}</span>
+        <span class="rec-item-disponivel">atual: ${fmt(item.estoqueAtual)}</span>
+        <button class="rec-item-remover" onclick="removerItemCompra(${idx})">✕</button>
+      </div>
+      <div class="rec-preview" id="compra-preview-${idx}"></div>
+    </div>
+  `).join('') + `
+    <div class="rec-resumo-total">${compraItens.length} produto${compraItens.length !== 1 ? 's' : ''} na nota fiscal</div>
+    <button type="button" class="btn-adicionar-mais"
+      onclick="document.getElementById('compraBuscaProduto').focus()">+ Adicionar mais produtos</button>
+  `;
+  compraItens.forEach((item, idx) => { if (item.qtd) window.atualizarQtdCompra(idx, item.qtd); });
+}
+
+window.confirmarCompra = async function() {
+  const numero     = document.getElementById('compraNumero').value.trim();
+  const fornecedor = document.getElementById('compraFornecedor').value.trim();
+  const resp       = document.getElementById('compraResp').value.trim();
+  const obs        = document.getElementById('compraObs').value.trim();
+  const erroEl     = document.getElementById('compraErro');
+  erroEl.textContent = '';
+
+  if (!numero)                 { erroEl.textContent = 'Informe o número da Nota Fiscal.'; return; }
+  if (!resp)                   { erroEl.textContent = 'Informe o responsável.'; return; }
+  if (compraItens.length === 0) { erroEl.textContent = 'Adicione ao menos um produto.'; return; }
+  for (const item of compraItens) {
+    const qtd = parseQtd(item.qtd);
+    if (!qtd || qtd <= 0) { erroEl.textContent = `Informe a quantidade de "${item.nome}".`; return; }
+  }
+
+  const btn = document.getElementById('btnConfirmarCompra');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  try {
+    const itensFinais = [];
+    for (const item of compraItens) {
+      const qtd = parseQtd(item.qtd);
+      await updateDoc(docRef('produtos', item.produtoId), { estoque: increment(qtd) });
+      const p = produtos.find(x => String(x.id) === String(item.produtoId));
+      const estoqueApos = Math.round((item.estoqueAtual + qtd) * 100) / 100;
+      itensFinais.push({ produtoId: item.produtoId, produto: item.nome,
+        classe: p?.classe || '', qtd, unidade: item.unidade, estoqueApos });
+    }
+    await addDoc(colRef('historico'), {
+      tipo: 'compra', numeroNF: numero, fornecedor, resp, obs,
+      itens: itensFinais, totalItens: itensFinais.length,
+      usuario: sessaoAtual.email, nomeUsuario: sessaoAtual.nome || sessaoAtual.email,
+      dataLocal: Date.now(), data: serverTimestamp()
+    });
+    window.fecharCompra();
+    mostrarToast(`✓ NF "${numero}" registrada (${itensFinais.length} produto${itensFinais.length !== 1 ? 's' : ''})!`, 'sucesso');
+  } catch(e) {
+    console.error(e);
+    erroEl.textContent = 'Erro ao registrar. Tente novamente.';
+  } finally {
+    btn.disabled = false; btn.textContent = '✓ Confirmar Entrada da Nota Fiscal';
+  }
+};
+
+// ─── CADASTRO INLINE (dentro de Compras) ───────────────────────────
+window.abrirCadastroInlineCompra = function() {
+  document.getElementById('cicNome').value    = document.getElementById('compraBuscaProduto').value.trim();
+  document.getElementById('cicPa').value      = '';
+  document.getElementById('cicClasse').value  = 'HERBICIDA';
+  document.getElementById('cicUnidade').value = 'L';
+  document.getElementById('cicErro').textContent = '';
+  document.getElementById('modalCadastroInline').classList.add('aberto');
+  setTimeout(() => document.getElementById('cicNome').focus(), 80);
+};
+
+window.fecharCadastroInlineCompra = function() {
+  document.getElementById('modalCadastroInline').classList.remove('aberto');
+};
+
+window.confirmarCadastroInlineCompra = async function() {
+  const nome    = document.getElementById('cicNome').value.trim();
+  const pa      = document.getElementById('cicPa').value.trim();
+  const classe  = document.getElementById('cicClasse').value;
+  const unidade = document.getElementById('cicUnidade').value;
+  const erroEl  = document.getElementById('cicErro');
+  erroEl.textContent = '';
+  if (!nome) { erroEl.textContent = 'Informe o nome do produto.'; return; }
+
+  const btn = document.getElementById('btnConfirmarCadastroInline');
+  btn.disabled = true; btn.textContent = 'Cadastrando...';
+
+  try {
+    const novoRef = await addDoc(colRef('produtos'), {
+      nome, principioAtivo: pa || classe, classe, unidade, estoque: 0,
+      createdAt: serverTimestamp()
+    });
+    compraItens.push({ produtoId: novoRef.id, nome, pa: pa || classe, unidade, estoqueAtual: 0, qtd: '' });
+    renderItensCompra();
+    window.fecharCadastroInlineCompra();
+    mostrarToast(`✓ "${nome}" cadastrado e adicionado à NF!`, 'sucesso');
+    setTimeout(() => {
+      const input = document.getElementById(`compra-qtd-${compraItens.length - 1}`);
+      if (input) input.focus();
+    }, 100);
+  } catch(e) {
+    console.error(e);
+    erroEl.textContent = 'Erro ao cadastrar produto.';
+  } finally {
+    btn.disabled = false; btn.textContent = '✓ Cadastrar e Adicionar à NF';
+  }
+};
 
 // ─── SUPER ADMIN ───────────────────────────────────────────────────
 async function carregarDadosAdmin() {
@@ -1769,6 +2930,9 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 document.getElementById('painelAdmin').addEventListener('click', e => {
   if (e.target === document.getElementById('painelAdmin')) fecharAdmin();
 });
+document.getElementById('painelGestaoIrrig').addEventListener('click', e => {
+  if (e.target === document.getElementById('painelGestaoIrrig')) fecharGestaoIrrig();
+});
 
 // ─── OFFLINE BADGE ─────────────────────────────────────────────────
 window.addEventListener('online',  () => document.getElementById('badgeOffline')?.classList.remove('visivel'));
@@ -1826,6 +2990,11 @@ window.iniciarModuloIrrigacao = async function() {
   popularMesesIrrig();
   popularFazendasSelect();
   iniciarListenersIrrig();
+  // Mostrar botão Gestão só para admin
+  const btnGestao = document.getElementById('btnGestaoIrrig');
+  if (btnGestao && (sessaoAtual?.nivel === 'admin' || sessaoAtual?.nivel === 'super_admin')) {
+    btnGestao.style.display = 'block';
+  }
   renderIrrig();
 };
 
@@ -1915,6 +3084,13 @@ window.renderIrrig = function() {
             <div class="irrig-item-det">${l.percentimetro}% · ${esc(l.volta || '')} · ${esc(l.cultura || '')} · ${esc(l.safra || '')} · ${esc(l.usuario || '')}</div>
           </div>
           <div class="irrig-item-mm">${(l.mm || 0).toFixed(1)} mm</div>
+          ${sessaoAtual?.nivel === 'admin' || sessaoAtual?.nivel === 'super_admin' ? `
+          <div style="display:flex;flex-direction:column;gap:4px;margin-left:8px">
+            <button onclick="abrirEditarLancIrrig('${l.id}')"
+              style="background:var(--verde-claro);color:var(--verde-campo);border:1px solid var(--verde-borda);border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap">✏️ Editar</button>
+            <button onclick="excluirLancIrrig('${l.id}')"
+              style="background:#fceaea;color:#9b1c1c;border:1px solid #f5c6c6;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer">🗑️</button>
+          </div>` : ''}
         </div>`;
       }).join('');
     }
@@ -2041,6 +3217,165 @@ window.seedPivotos = async function() {
   await carregarPivotos();
   popularFazendasSelect();
   renderIrrig();
+};
+
+// ─── GESTÃO DE PIVÔS ───────────────────────────────────────────────
+window.abrirGestaoIrrig = async function() {
+  await carregarPivotos();
+  renderGestaoIrrig();
+  document.getElementById('painelGestaoIrrig').classList.add('aberto');
+};
+
+window.fecharGestaoIrrig = function() {
+  document.getElementById('painelGestaoIrrig').classList.remove('aberto');
+};
+
+function renderGestaoIrrig() {
+  const el = document.getElementById('gestaoIrrigLista');
+  if (!el) return;
+  const fazendas = [...new Set(irrigPivotos.map(p => p.fazenda))].sort();
+  if (fazendas.length === 0) {
+    el.innerHTML = '<div style="color:var(--texto-suave);font-size:13px">Nenhum pivô cadastrado</div>';
+    return;
+  }
+  el.innerHTML = fazendas.map(faz => {
+    const pivosFaz = irrigPivotos.filter(p => p.fazenda === faz);
+    return `<div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--verde-folha);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--verde-borda)">${esc(faz)}</div>
+      ${pivosFaz.map(p => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--fundo)">
+          <span style="font-size:13px;font-weight:600;color:var(--verde-floresta)">${esc(p.nome)}</span>
+          <div style="display:flex;gap:6px">
+            <button onclick="abrirModalEditarPivo('${p.id}')"
+              style="background:var(--verde-claro);color:var(--verde-campo);border:1px solid var(--verde-borda);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">✏️ Editar</button>
+            <button onclick="excluirPivo('${p.id}','${esc(p.nome)}')"
+              style="background:#fceaea;color:#9b1c1c;border:1px solid #f5c6c6;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🗑️</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+let editandoPivoId = null;
+
+window.abrirModalNovoPivo = function() {
+  editandoPivoId = null;
+  document.getElementById('modalPivoTitulo').textContent = 'Novo Pivô';
+  document.getElementById('pivoFazenda').value = '';
+  document.getElementById('pivoNome').value = '';
+  document.getElementById('pivoErro').textContent = '';
+  gerarTabelaInputs({});
+  abrirModal('modalPivo');
+};
+
+window.abrirModalEditarPivo = function(id) {
+  const pivo = irrigPivotos.find(p => p.id === id);
+  if (!pivo) return;
+  editandoPivoId = id;
+  document.getElementById('modalPivoTitulo').textContent = `Editar — ${pivo.nome}`;
+  document.getElementById('pivoFazenda').value = pivo.fazenda || '';
+  document.getElementById('pivoNome').value = pivo.nome || '';
+  document.getElementById('pivoErro').textContent = '';
+  gerarTabelaInputs(pivo.tabela || {});
+  abrirModal('modalPivo');
+};
+
+function gerarTabelaInputs(tabela) {
+  const container = document.getElementById('pivoTabelaInputs');
+  if (!container) return;
+  const pcts = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100];
+  container.innerHTML = pcts.map(pct => `
+    <div style="text-align:center">
+      <div style="font-size:10px;font-weight:700;color:var(--texto-suave);margin-bottom:3px">${pct}%</div>
+      <input type="number" step="0.1" min="0" id="tabPct${pct}"
+        value="${tabela[pct] || ''}"
+        style="width:100%;border:1px solid var(--verde-borda);border-radius:6px;padding:5px;font-size:12px;text-align:center;background:var(--verde-claro);outline:none"
+        placeholder="mm" />
+    </div>`).join('');
+}
+
+window.salvarPivo = async function() {
+  const fazenda = document.getElementById('pivoFazenda').value.trim().toUpperCase();
+  const nome    = document.getElementById('pivoNome').value.trim();
+  const erro    = document.getElementById('pivoErro');
+  if (!fazenda) { erro.textContent = 'Informe o nome da fazenda.'; return; }
+  if (!nome)    { erro.textContent = 'Informe o nome do pivô.'; return; }
+
+  const pcts = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100];
+  const tabela = {};
+  pcts.forEach(pct => {
+    const v = parseFloat(document.getElementById(`tabPct${pct}`)?.value);
+    if (!isNaN(v) && v > 0) tabela[pct] = v;
+  });
+
+  if (Object.keys(tabela).length === 0) { erro.textContent = 'Informe pelo menos um valor de MM.'; return; }
+
+  erro.textContent = '';
+  try {
+    if (editandoPivoId) {
+      await updateDoc(doc(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_pivotos', editandoPivoId), { fazenda, nome, tabela });
+    } else {
+      await addDoc(collection(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_pivotos'), { fazenda, nome, tabela });
+    }
+    await carregarPivotos();
+    renderGestaoIrrig();
+    renderIrrig();
+    fecharModal('modalPivo');
+  } catch(e) {
+    erro.textContent = 'Erro: ' + e.message;
+  }
+};
+
+window.excluirPivo = async function(id, nome) {
+  if (!confirm(`Excluir o pivô "${nome}"?`)) return;
+  try {
+    await deleteDoc(doc(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_pivotos', id));
+    await carregarPivotos();
+    renderGestaoIrrig();
+    renderIrrig();
+  } catch(e) {
+    alert('Erro: ' + e.message);
+  }
+};
+
+// ─── EDITAR / EXCLUIR LANÇAMENTO ───────────────────────────────────
+window.abrirEditarLancIrrig = function(id) {
+  const l = irrigLancamentos.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('irrigEditId').value  = id;
+  document.getElementById('irrigEditData').value = l.data || '';
+  document.getElementById('irrigEditCultura').value = l.cultura || '🌱 Soja';
+  document.getElementById('irrigEditSafra').value   = l.safra || '25/26';
+  document.getElementById('irrigEditErro').textContent = '';
+  abrirModal('modalIrrigEdit');
+};
+
+window.salvarEdicaoIrrig = async function() {
+  const id      = document.getElementById('irrigEditId').value;
+  const data    = document.getElementById('irrigEditData').value;
+  const cultura = document.getElementById('irrigEditCultura').value;
+  const safra   = document.getElementById('irrigEditSafra').value;
+  const erro    = document.getElementById('irrigEditErro');
+  if (!data) { erro.textContent = 'Informe a data.'; return; }
+  erro.textContent = '';
+  try {
+    await updateDoc(doc(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_lancamentos', id), {
+      data, cultura, safra,
+      dataLocal: new Date(data + 'T12:00:00').getTime()
+    });
+    fecharModal('modalIrrigEdit');
+  } catch(e) {
+    erro.textContent = 'Erro: ' + e.message;
+  }
+};
+
+window.excluirLancIrrig = async function(id) {
+  if (!confirm('Excluir este lançamento?')) return;
+  try {
+    await deleteDoc(doc(db, 'empresas', sessaoAtual.empresaId, 'irrigacao_lancamentos', id));
+  } catch(e) {
+    alert('Erro: ' + e.message);
+  }
 };
 
 // ─── SEED VIA CONSOLE ──────────────────────────────────────────────
